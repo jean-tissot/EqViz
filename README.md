@@ -11,7 +11,8 @@ This project intents to be a standalone client. A server part could be added in 
 
 ## Development informations
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.7.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.7.  
+Project was udpated from angular 12 to **angular 13**, so you need **angular cli version 13**.
 - To set this project (install dependencies): run `make client_set` (or `make cs`)
 - To serve this project (for development): run `make client_open` (or `make co`).  
 Run `make client_up` (or `make cu`) to serve without opening in browser
