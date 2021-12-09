@@ -1,8 +1,8 @@
-
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 // Plus imports for other components in your app.
+@use "styles-custom" as custom;
 
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
@@ -20,20 +20,29 @@ $eqviz-client-warn: mat.define-palette(mat.$red-palette);
 
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".
-$eqviz-client-theme: mat.define-light-theme((
-  color: (
-    primary: $eqviz-client-primary,
-    accent: $eqviz-client-accent,
-    warn: $eqviz-client-warn,
+$eqviz-client-theme: mat.define-dark-theme(
+  (
+    color: (
+      primary: $eqviz-client-primary,
+      accent: $eqviz-client-accent,
+      warn: $eqviz-client-warn,
+    ),
   )
-));
+);
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 @include mat.all-component-themes($eqviz-client-theme);
+@include custom.theme($eqviz-client-theme);
 
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

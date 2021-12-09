@@ -1,1 +1,30 @@
-<h1>{{title}}</h1>
+<mat-drawer-container class="drawer-container">
+  <mat-drawer #drawer class="drawer" fixedInViewport
+      [mode]="!sideNavPinned ? 'over': 'side' "
+      [opened]="sideNavPinned">
+    <mat-toolbar color="primary">
+      <button mat-button (click)="sideNavPinned = !sideNavPinned">
+        <mat-icon [color]="sideNavPinned ? 'accent' : '' ">push_pin</mat-icon>
+      </button>
+    </mat-toolbar>
+    <app-settings></app-settings>
+  </mat-drawer>
+  <mat-drawer-content>
+    <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle drawer"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="!drawer.opened">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <a routerLink="/">EqViz</a>
+      <a class="nav-button" routerLink="/spack" routerLinkActive="active">spack</a>
+      <a class="nav-button" routerLink="/ampl-time" routerLinkActive="active">ampl./time</a>
+      <a class="nav-button" routerLink="/freq-time" routerLinkActive="active">freq./time</a>
+      <a class="nav-button" routerLink="/ampl-freq" routerLinkActive="active">ampl./freq.</a>
+    </mat-toolbar>
+    <router-outlet></router-outlet>
+    </mat-drawer-content>
+</mat-drawer-container>

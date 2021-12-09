@@ -20,5 +20,4 @@ Project was udpated from angular 12 to **angular 13**, so you need **angular cli
   Run `make client_up` (or `make cu`) to serve without opening in browser
 - To run unit tests (via [Karma](https://karma-runner.github.io)): run `make client_test`(or `make ct`)
 - To build this project: run `make client_build` (or `make cb`)
-- To deploy this build to [github pages](https://jean-tissot.github.io/EqViz/) : run `make client_deploy` (or `make cd`)
-- To build and deploy this project to [github pages](https://jean-tissot.github.io/EqViz/) : run `make client_build_deploy` (or `make cbd`)
+- To build and deploy this project to [github pages](https://jean-tissot.github.io/EqViz/) : run `make client_deploy` (or `make cd`)
