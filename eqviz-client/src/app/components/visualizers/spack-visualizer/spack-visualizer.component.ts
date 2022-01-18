@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AudioService } from 'src/app/services/audio.service';
 
 @Component({
   selector: 'app-spack-visualizer',
@@ -7,9 +8,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SpackVisualizerComponent implements OnInit {
 
-  constructor() { }
+  constructor(private audioService: AudioService) { }
 
   ngOnInit(): void {
+    this.audioService.getAnalyser().then((analyser: AnalyserNode) => {
+      var dataTime = new Float32Array(analyser.fftSize);
+      setInterval(
+        () => {
+          analyser.getFloatTimeDomainData(dataTime);
+          console.log(dataTime);
+        },
+        1000
+      );
+    });
   }
 
 }
