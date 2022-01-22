@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
 
 @Component({
@@ -6,21 +7,21 @@ import { AudioService } from 'src/app/services/audio.service';
   templateUrl: './spack-visualizer.component.html',
   styleUrls: ['./spack-visualizer.component.scss']
 })
-export class SpackVisualizerComponent implements OnInit {
+export class SpackVisualizerComponent implements OnInit, OnDestroy {
+
+  private analyser?: Analyser;
 
   constructor(private audioService: AudioService) { }
 
   ngOnInit(): void {
-    this.audioService.getAnalyser().then((analyser: AnalyserNode) => {
-      var dataTime = new Float32Array(analyser.fftSize);
-      setInterval(
-        () => {
-          analyser.getFloatTimeDomainData(dataTime);
-          console.log(dataTime);
-        },
-        1000
-      );
+    this.audioService.startAnalyser().then((analyser: Analyser) => {
+      this.analyser = analyser;
+      // do stuff with this analyser
     });
+  }
+
+  ngOnDestroy(): void {
+    this.analyser?.stop();
   }
 
 }

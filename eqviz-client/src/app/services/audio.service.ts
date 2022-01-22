@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Analyser } from '../objects/analyser';
 import { AudioSourceService } from './audio-source.service';
 
 @Injectable({
@@ -6,7 +7,11 @@ import { AudioSourceService } from './audio-source.service';
 })
 export class AudioService {
 
+  // TODO: add source type to objects folder - add other possible sources in source type
   private source: 'mic' = 'mic';
+  // TODO: make possible to change Nftt ?
+  private Nfft = 8192; // 185.8 ms if Fe = 44100 Hz (contexteAudio.sampleRate)
+  private audioCtx = new window.AudioContext();
 
   constructor(private audioSourceService: AudioSourceService) {
   }
@@ -19,22 +24,21 @@ export class AudioService {
     }
   }
 
-  public getAnalyser(): Promise<AnalyserNode> {
+  public startAnalyser(): Promise<Analyser> {
     return this.getStream().then((stream: MediaStream) => {
-      console.log(stream);
 
-      var Nfft = 8192; // 185.8 ms if Fe = 44100 Hz (contexteAudio.sampleRate)
-      var contexteAudio = new window.AudioContext();
+      console.log("stream", stream.id, "started");
 
-      var analyser = contexteAudio.createAnalyser();
+      var analyser = this.audioCtx.createAnalyser();
       analyser.smoothingTimeConstant = 0;
-      analyser.fftSize = Nfft;
+      analyser.fftSize = this.Nfft;
 
-      var source = contexteAudio.createMediaStreamSource(stream);
-      source.connect(analyser);
+      var source = this.audioCtx.createMediaStreamSource(stream);
 
-      return analyser;
+      return new Analyser(source, analyser);
     });
   }
+
+  // TODO: Add setSource method
 
 }
