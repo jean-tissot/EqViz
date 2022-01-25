@@ -10,7 +10,7 @@ export class AudioService {
   // TODO: add source type to objects folder - add other possible sources in source type
   private source: 'mic' = 'mic';
   // TODO: make possible to change Nftt ?
-  private Nfft = 8192; // 185.8 ms if Fe = 44100 Hz (contexteAudio.sampleRate)
+  private Nfft = 2 ** 10; // T = Nfft/Fe (Fe=contexteAudio.sampleRate)
   private audioCtx = new window.AudioContext();
 
   constructor(private audioSourceService: AudioSourceService) {
