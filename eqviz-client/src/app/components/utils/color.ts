@@ -3,7 +3,7 @@ export class Colors {
     let colors: string[] = [];
     for (let i = n - 1; i >= 0; i--) {
       var r, g, b;
-      [r, g, b] = this.hslToRgb(i / n * 180 + 60, 80, 50);
+      [r, g, b] = this.hslToRgb(i / n * 180 + 60, 70, 40);
       colors.push('rgb(' + r + ',' + g + ',' + b + ')');
     }
     return colors;

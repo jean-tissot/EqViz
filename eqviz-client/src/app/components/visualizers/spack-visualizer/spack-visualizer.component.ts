@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
 import { Colors } from '../../utils/color';
+import { Drawer } from '../../utils/drawer';
 
 @Component({
   selector: 'app-spack-visualizer',
@@ -62,6 +63,7 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
     var precValue = 0
     for (let i = 0; i < this.nbFreqs; i++) {
       let value = dataFreq.slice(Math.round(nbFreqByStack * i), Math.round(nbFreqByStack * (i + 1))).reduce((a: number, b: number) => a + b) / nbFreqByStack;
+      // we stack the values
       value += precValue;
       this.data[i].push(value);
       precValue = value;
@@ -77,43 +79,18 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
     var colors = Colors.generate(this.nbFreqs);
     var ratio = 256.0 * this.nbFreqs;
 
+    var drawer = new Drawer(ctxCanvas, ratio);
+
     for (let i = this.nbFreqs - 1; i >= 0; i--) {
 
       ctxCanvas.strokeStyle = colors[i];
       ctxCanvas.fillStyle = colors[i];
 
-
-      this.trace(this.data[i].slice(start, this.data[0].length), ratio, ctxCanvas);
+      drawer.trace(this.data[i].slice(start, this.data[0].length));
     }
 
     requestAnimationFrame(() => this.draw(canvas, ctxCanvas, analyser));
 
-  }
-
-
-  private trace(data: number[], ratio: number, ctxCanvas: CanvasRenderingContext2D) {
-
-    var WIDTH = ctxCanvas.canvas.width;
-    var HEIGHT = ctxCanvas.canvas.height;
-    var sliceWidth = WIDTH * 1.0 / (this.displayLength - 1);
-
-    ctxCanvas.beginPath();
-    ctxCanvas.moveTo(0, HEIGHT);
-    var x = 0;
-
-    for (let value of data) {
-
-      var y = (1 - value / ratio) * HEIGHT;
-
-      ctxCanvas.lineTo(x, y);
-
-      x += sliceWidth;
-    }
-
-    ctxCanvas.lineTo(WIDTH, HEIGHT);
-    ctxCanvas.closePath();
-    ctxCanvas.fill();
-    ctxCanvas.stroke();
   }
 
 }
