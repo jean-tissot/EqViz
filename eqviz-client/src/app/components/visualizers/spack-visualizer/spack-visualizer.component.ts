@@ -13,8 +13,11 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
   private analyser?: Analyser;
   private nbFreqs = 5;
+  private colors = Colors.generate(this.nbFreqs);
   private data: number[][] = [];
   private displayLength = 100;
+  private ctxCanvas?: CanvasRenderingContext2D;
+  private drawer?: Drawer;
 
   constructor(private audioService: AudioService) { }
 
@@ -22,42 +25,30 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.nbFreqs; i++) {
       this.data.push(new Array(this.displayLength).fill(0));
     }
-    var canvas = document.getElementById("spack-canvas") as HTMLCanvasElement;
-    this.fitToContainer(canvas);
-    var ctxCanvas = canvas?.getContext("2d");
-    this.audioService.startAnalyser().then((analyser: Analyser) => {
-      this.analyser = analyser;
-      // do stuff with this analyser
-      this.draw(canvas, ctxCanvas, analyser);
-    });
+    let canvas = document.getElementById("spack-canvas") as HTMLCanvasElement;
+    Drawer.fitToContainer(canvas);
+    let ctxCanvas = canvas?.getContext("2d");
+    if (ctxCanvas) {
+      this.ctxCanvas = ctxCanvas;
+      this.drawer = new Drawer(ctxCanvas, 256.0 * this.nbFreqs, true, true);
+      this.audioService.startAnalyser().then((analyser: Analyser) => {
+        this.analyser = analyser;
+        this.draw();
+      });
+    } else {
+      console.log("Impossible d'afficher le canvas");
+    }
   }
 
   ngOnDestroy(): void {
     this.analyser?.stop();
   }
 
-  fitToContainer(canvas: HTMLCanvasElement) {
-    // Make it visually fill the positioned parent
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    // ...then set the internal size to match
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-  }
+  private draw() {
 
+    if (!this.analyser || !this.ctxCanvas) return
 
-  private draw(canvas: HTMLCanvasElement, ctxCanvas: CanvasRenderingContext2D | null, analyser: Analyser) {
-
-    var WIDTH = canvas.width;
-    var HEIGHT = canvas.height;
-
-
-    if (!analyser || !canvas || !ctxCanvas) {
-      console.log("Impossible d'afficher le canvas")
-      return
-    }
-
-    var dataFreq = analyser.getFrequencyValues();
+    var dataFreq = this.analyser.getFrequencyValues();
     var nbFreqByStack = dataFreq.length / this.nbFreqs;
 
     var precValue = 0
@@ -69,27 +60,22 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
       precValue = value;
     }
 
-    ctxCanvas.fillStyle = 'rgb(10, 10, 10)';
-    ctxCanvas.fillRect(0, 0, WIDTH, HEIGHT);
+    this.ctxCanvas.fillStyle = 'rgb(10, 10, 10)';
+    this.ctxCanvas.fillRect(0, 0, this.ctxCanvas.canvas.width, this.ctxCanvas.canvas.height);
 
-    ctxCanvas.lineWidth = 3;
+    this.ctxCanvas.lineWidth = 3;
 
-    var start = Math.max(0, this.data[0].length - this.displayLength)
-
-    var colors = Colors.generate(this.nbFreqs);
-    var ratio = 256.0 * this.nbFreqs;
-
-    var drawer = new Drawer(ctxCanvas, ratio);
+    var start = Math.max(0, this.data[0].length - this.displayLength);
 
     for (let i = this.nbFreqs - 1; i >= 0; i--) {
 
-      ctxCanvas.strokeStyle = colors[i];
-      ctxCanvas.fillStyle = colors[i];
+      this.ctxCanvas.strokeStyle = this.colors[i];
+      this.ctxCanvas.fillStyle = this.colors[i];
 
-      drawer.trace(this.data[i].slice(start, this.data[0].length));
+      this.drawer?.trace(this.data[i].slice(start, this.data[0].length));
     }
 
-    requestAnimationFrame(() => this.draw(canvas, ctxCanvas, analyser));
+    requestAnimationFrame(() => this.draw());
 
   }
 

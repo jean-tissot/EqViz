@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
+import { Drawer } from '../../utils/drawer';
 
 @Component({
   selector: 'app-ampl-freq-visualizer',
@@ -10,80 +11,51 @@ import { AudioService } from 'src/app/services/audio.service';
 export class AmplFreqVisualizerComponent implements OnInit {
 
   private analyser?: Analyser;
+  private drawer?: Drawer;
+  private ctxCanvas?: CanvasRenderingContext2D;
 
   constructor(private audioService: AudioService) { }
 
   ngOnInit(): void {
-    var canvas = document.getElementById("ampl-freq-canvas") as HTMLCanvasElement;
-    this.fitToContainer(canvas);
-    var ctxCanvas = canvas?.getContext("2d");
-    this.audioService.startAnalyser().then((analyser: Analyser) => {
-      this.analyser = analyser;
-      // do stuff with this analyser
-      this.draw(canvas, ctxCanvas, analyser);
-    });
+    let canvas = document.getElementById("ampl-freq-canvas") as HTMLCanvasElement;
+    Drawer.fitToContainer(canvas);
+    let ctxCanvas = canvas?.getContext("2d");
+    if (ctxCanvas) {
+      this.ctxCanvas = ctxCanvas;
+      this.drawer = new Drawer(ctxCanvas, 256, true);
+      this.audioService.startAnalyser().then((analyser: Analyser) => {
+        this.analyser = analyser;
+        this.draw();
+      });
+    } else {
+      console.log("Impossible d'afficher le canvas");
+    }
   }
 
   ngOnDestroy(): void {
     this.analyser?.stop();
   }
 
-  fitToContainer(canvas: HTMLCanvasElement) {
-    // Make it visually fill the positioned parent
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    // ...then set the internal size to match
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-  }
 
+  private draw() {
 
-  private draw(canvas: HTMLCanvasElement, ctxCanvas: CanvasRenderingContext2D | null, analyser: Analyser) {
+    // moyenne glissée sur le temps
+    // augmenter le pas de fréquence
 
-    var WIDTH = canvas.width;
-    var HEIGHT = canvas.height;
+    if (!this.analyser || !this.ctxCanvas) return
 
+    var dataFreq = this.analyser.getFrequencyValues();
 
-    if (!analyser || !canvas || !ctxCanvas) {
-      console.log("Impossible d'afficher le canvas")
-      return
-    }
+    // this.ctxCanvas.fillStyle = 'rgb(200, 200, 200)';
+    this.ctxCanvas.fillRect(0, 0, this.ctxCanvas.canvas.width, this.ctxCanvas.canvas.height);
 
-    requestAnimationFrame(() => this.draw(canvas, ctxCanvas, analyser));
+    this.ctxCanvas.lineWidth = 2;
+    this.ctxCanvas.strokeStyle = 'rgb(200, 0, 200)';
 
+    this.drawer?.trace(dataFreq);
 
-    var dataFreq = analyser.getFrequencyValues();
-    var dataSize = dataFreq.length;
-
-    // ctxCanvas.fillStyle = 'rgb(200, 200, 200)';
-    ctxCanvas.fillRect(0, 0, WIDTH, HEIGHT);
-
-    ctxCanvas.lineWidth = 2;
-    ctxCanvas.strokeStyle = 'rgb(200, 0, 200)';
-
-    ctxCanvas.beginPath();
-
-    var sliceWidth = WIDTH * 1.0 / dataSize;
-    var x = 0;
-
-    for (var i = 0; i < dataSize; i++) {
-
-      var v = dataFreq[i] / 128.0;
-      var y = (1 - v) * HEIGHT;
-
-      if (i === 0) {
-        ctxCanvas.moveTo(x, y);
-      } else {
-        ctxCanvas.lineTo(x, y);
-      }
-
-      x += sliceWidth;
-    }
-
-    ctxCanvas.lineTo(canvas.width, canvas.height / 2);
-    ctxCanvas.stroke();
+    requestAnimationFrame(() => this.draw());
 
   }
-
 
 }
