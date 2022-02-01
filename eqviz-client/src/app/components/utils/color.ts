@@ -2,11 +2,15 @@ export class Colors {
   public static generate(n: number) {
     let colors: string[] = [];
     for (let i = n - 1; i >= 0; i--) {
-      var r, g, b;
-      [r, g, b] = this.hslToRgb(i / n * 180 + 60, 70, 40);
-      colors.push('rgb(' + r + ',' + g + ',' + b + ')');
+      colors.push(this.getFromGradient(i, n));
     }
     return colors;
+  }
+
+  public static getFromGradient(value: number, max_value: number): string {
+    var r, g, b;
+    [r, g, b] = this.hslToRgb(value / max_value * 180 + 60, 70, 40);
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
   }
 
   public static hslToRgb(h: number, s: number, l: number): [number, number, number] {

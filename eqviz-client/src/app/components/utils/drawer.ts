@@ -1,10 +1,10 @@
+import { Colors } from "./color";
 
 export class Drawer {
 
-
     constructor(
         private ctxCanvas: CanvasRenderingContext2D,
-        private ratio: number,
+        private ratio: number, // used for scaling values to display
         private inverted: boolean = false,
         private filled: boolean = false) {
     }
@@ -13,7 +13,7 @@ export class Drawer {
 
         var WIDTH = this.ctxCanvas.canvas.width;
         var HEIGHT = this.ctxCanvas.canvas.height;
-        var sliceWidth = WIDTH * 1.0 / (data.length - 1);
+        var dx = WIDTH * 1.0 / (data.length - 1);
 
         this.ctxCanvas.beginPath();
         if (this.filled) {
@@ -31,7 +31,7 @@ export class Drawer {
 
             this.ctxCanvas.lineTo(x, y);
 
-            x += sliceWidth;
+            x += dx;
         }
 
         if (this.filled) {
@@ -40,6 +40,29 @@ export class Drawer {
             this.ctxCanvas.fill();
         }
         this.ctxCanvas.stroke();
+    }
+
+    spectrogram(data: Uint8Array[]) {
+
+        var WIDTH = this.ctxCanvas.canvas.width;
+        var HEIGHT = this.ctxCanvas.canvas.height;
+
+        var dx = WIDTH * 1.0 / (data.length - 1);
+        var ny = data[data.length - 1].length;
+        var abs_dy = HEIGHT / (ny - 1);
+        var dy = this.inverted ? -abs_dy : abs_dy;
+
+        var x = 0;
+        for (let freqs of data) {
+            var y = this.inverted ? HEIGHT - abs_dy : 0;
+            for (let i = 0; i < ny; i++) {
+                this.ctxCanvas.fillStyle = Colors.getFromGradient(freqs[i], this.ratio);
+                this.ctxCanvas.fillRect(x, y, dx, abs_dy);
+                y += dy;
+            }
+            x += dx;
+        }
+
     }
 
     static fitToContainer(canvas: HTMLCanvasElement) {
