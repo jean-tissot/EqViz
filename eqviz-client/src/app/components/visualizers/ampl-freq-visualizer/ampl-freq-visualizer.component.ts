@@ -34,6 +34,8 @@ export class AmplFreqVisualizerComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.analyser?.stop();
+    this.analyser = undefined;
+    this.drawer = undefined;
   }
 
 

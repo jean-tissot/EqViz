@@ -42,6 +42,8 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.analyser?.stop();
+    this.analyser = undefined;
+    this.drawer = undefined;
   }
 
   private draw() {

@@ -39,6 +39,7 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.analyser?.stop();
+    this.analyser = undefined;
     this.drawer = undefined;
     // this.data = [];
   }
