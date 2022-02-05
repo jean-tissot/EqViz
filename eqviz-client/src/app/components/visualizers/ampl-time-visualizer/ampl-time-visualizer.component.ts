@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
+import { SettingsService } from 'src/app/services/settings.service';
 import { Drawer } from '../../utils/drawer';
 
 @Component({
@@ -14,9 +15,10 @@ export class AmplTimeVisualizerComponent implements OnInit {
   private ctxCanvas?: CanvasRenderingContext2D;
   private drawer?: Drawer;
 
-  constructor(private audioService: AudioService) { }
+  constructor(private audioService: AudioService, private settings: SettingsService) { }
 
   ngOnInit(): void {
+    this.settings.setCurrentVisualizer(2);
     let canvas = document.getElementById("ampl-time-canvas") as HTMLCanvasElement;
     Drawer.fitToContainer(canvas);
     let ctxCanvas = canvas?.getContext("2d");

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SettingsService } from 'src/app/services/settings.service';
 
 @Component({
   selector: 'app-settings',
@@ -7,9 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SettingsComponent implements OnInit {
 
-  constructor() { }
+  currentVisualizer = 0;
+
+  constructor(private settingsService: SettingsService) { }
 
   ngOnInit(): void {
+    this.settingsService.visualiserChange().subscribe((current: number) => this.currentVisualizer = current);
   }
 
 }

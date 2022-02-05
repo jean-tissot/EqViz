@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
+import { SettingsService } from 'src/app/services/settings.service';
 import { Drawer } from '../../utils/drawer';
 
 @Component({
@@ -16,9 +17,10 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
   private data: Uint8Array[] = [];
   private displayLength = 100;
 
-  constructor(private audioService: AudioService) { }
+  constructor(private audioService: AudioService, private settings: SettingsService) { }
 
   ngOnInit(): void {
+    this.settings.setCurrentVisualizer(3);
     for (let i = 0; i < this.displayLength; i++) {
       this.data.push(new Uint8Array());
     }

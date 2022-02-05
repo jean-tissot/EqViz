@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
+import { SettingsService } from 'src/app/services/settings.service';
 import { Colors } from '../../utils/color';
 import { Drawer } from '../../utils/drawer';
 
@@ -19,9 +20,10 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
   private ctxCanvas?: CanvasRenderingContext2D;
   private drawer?: Drawer;
 
-  constructor(private audioService: AudioService) { }
+  constructor(private audioService: AudioService, private settings: SettingsService) { }
 
   ngOnInit(): void {
+    this.settings.setCurrentVisualizer(1);
     for (let i = 0; i < this.nbFreqs; i++) {
       this.data.push(new Array(this.displayLength).fill(0));
     }
