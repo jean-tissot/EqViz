@@ -2,9 +2,8 @@
     <div *ngIf="currentVisualizer">
         <label for="nfft">Nfft :</label>
         <mat-form-field id="nfft">
-            <mat-label>Select</mat-label>
             <mat-select [(value)]="nfft">
-                <mat-option *ngFor="let value of nfftPossibleValues" value="{{value}}">{{value}}</mat-option>
+                <mat-option *ngFor="let value of nfftPossibleValues" [value]="value">{{value}}</mat-option>
             </mat-select>
         </mat-form-field>
     </div>

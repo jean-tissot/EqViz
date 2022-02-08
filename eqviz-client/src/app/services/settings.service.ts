@@ -9,7 +9,7 @@ export class SettingsService {
     /** Subscribe with the function to call on visualizer change */
     visualizerChange = new BehaviorSubject<number>(0);
     /** Subscribe with the function to call on nfft value change */
-    nfftChange = new BehaviorSubject<number>(0);
+    nfftChange = new BehaviorSubject<number>(64);
 
     private nfftValues = [512, 4096, 128, 4096];
 
