@@ -18,7 +18,7 @@ export class AmplFreqVisualizerComponent implements OnInit {
   constructor(private audioService: AudioService, private settings: SettingsService) { }
 
   ngOnInit(): void {
-    this.settings.setCurrentVisualizer(4);
+    this.settings.setCurrentVisualizer('ampl-freq');
     let canvas = document.getElementById("ampl-freq-canvas") as HTMLCanvasElement;
     Drawer.fitToContainer(canvas);
     let ctxCanvas = canvas?.getContext("2d");

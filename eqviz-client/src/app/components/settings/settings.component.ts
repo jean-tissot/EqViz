@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Visualizer } from 'src/app/objects/types';
 import { SettingsService } from 'src/app/services/settings.service';
 
 @Component({
@@ -8,18 +9,11 @@ import { SettingsService } from 'src/app/services/settings.service';
 })
 export class SettingsComponent implements OnInit {
 
-  currentVisualizer = 0;
+  currentVisualizer: Visualizer = 'none';
   nfftPossibleValues = [2 ** 5, 2 ** 6, 2 ** 7, 2 ** 8, 2 ** 9, 2 ** 10, 2 ** 11, 2 ** 12, 2 ** 13, 2 ** 14, 2 ** 15]
+  displayLenghtPossibleValues = [50, 100, 150, 200]
 
-  get nfft() {
-    return this.settingsService.nfft;
-  }
-
-  set nfft(value: number) {
-    this.settingsService.nfft = value;
-  }
-
-  constructor(private settingsService: SettingsService) { }
+  constructor(public settingsService: SettingsService) { }
 
   ngOnInit(): void {
     // Each time the visualizer changes, we update the currentVisualizer attribute in order to adapt the left side panel

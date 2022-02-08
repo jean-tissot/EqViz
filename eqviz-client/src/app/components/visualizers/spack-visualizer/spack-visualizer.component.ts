@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
 import { SettingsService } from 'src/app/services/settings.service';
@@ -19,11 +20,13 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
   private displayLength = 100;
   private ctxCanvas?: CanvasRenderingContext2D;
   private drawer?: Drawer;
+  private displayLengthSupscritpion?: Subscription;
 
   constructor(private audioService: AudioService, private settings: SettingsService) { }
 
   ngOnInit(): void {
-    this.settings.setCurrentVisualizer(1);
+    this.settings.setCurrentVisualizer('spack');
+    this.displayLength = this.settings.displayLengthChange.getValue();
     for (let i = 0; i < this.nbFreqs; i++) {
       this.data.push(new Array(this.displayLength).fill(0));
     }
@@ -37,6 +40,7 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
         this.analyser = analyser;
         this.draw();
       });
+      this.displayLengthSupscritpion = this.settings.displayLengthChange.subscribe(value => this.displayLength = value);
     } else {
       console.log("Impossible d'afficher le canvas");
     }
@@ -46,6 +50,7 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
     this.analyser?.stop();
     this.analyser = undefined;
     this.drawer = undefined;
+    this.displayLengthSupscritpion?.unsubscribe();
   }
 
   private draw() {

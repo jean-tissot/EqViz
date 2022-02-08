@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
 import { SettingsService } from 'src/app/services/settings.service';
@@ -16,11 +17,13 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
   private ctxCanvas?: CanvasRenderingContext2D;
   private data: Uint8Array[] = [];
   private displayLength = 100;
+  private displayLengthSupscritpion?: Subscription;
 
   constructor(private audioService: AudioService, private settings: SettingsService) { }
 
   ngOnInit(): void {
-    this.settings.setCurrentVisualizer(3);
+    this.settings.setCurrentVisualizer('freq-time');
+    this.displayLength = this.settings.displayLengthChange.getValue();
     for (let i = 0; i < this.displayLength; i++) {
       this.data.push(new Uint8Array());
     }
@@ -34,6 +37,7 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
         this.analyser = analyser;
         this.draw();
       });
+      this.displayLengthSupscritpion = this.settings.displayLengthChange.subscribe(value => this.displayLength = value);
     } else {
       console.log("Impossible d'afficher le canvas");
     }
@@ -43,6 +47,7 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
     this.analyser?.stop();
     this.analyser = undefined;
     this.drawer = undefined;
+    this.displayLengthSupscritpion?.unsubscribe();
     // this.data = [];
   }
 

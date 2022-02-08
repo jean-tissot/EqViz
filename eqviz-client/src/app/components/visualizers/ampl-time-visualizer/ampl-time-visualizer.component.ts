@@ -18,7 +18,7 @@ export class AmplTimeVisualizerComponent implements OnInit {
   constructor(private audioService: AudioService, private settings: SettingsService) { }
 
   ngOnInit(): void {
-    this.settings.setCurrentVisualizer(2);
+    this.settings.setCurrentVisualizer('ampl-time');
     let canvas = document.getElementById("ampl-time-canvas") as HTMLCanvasElement;
     Drawer.fitToContainer(canvas);
     let ctxCanvas = canvas?.getContext("2d");

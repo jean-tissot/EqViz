@@ -1,9 +1,16 @@
 <div id="list">
-    <div *ngIf="currentVisualizer">
+    <div *ngIf="currentVisualizer!='none'">
         <label for="nfft">Nfft :</label>
         <mat-form-field id="nfft">
-            <mat-select [(value)]="nfft">
-                <mat-option *ngFor="let value of nfftPossibleValues" [value]="value">{{value}}</mat-option>
+            <mat-select [(value)]="settingsService.nfft">
+                <mat-option *ngFor="let nfftValue of nfftPossibleValues" [value]="nfftValue">{{nfftValue}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    <div *ngIf="currentVisualizer=='spack' || currentVisualizer=='freq-time'">
+        <label for="length">Display length :</label>
+        <mat-form-field id="length">
+            <mat-select [(value)]="settingsService.displayLength">
+                <mat-option *ngFor="let displayLengthValue of displayLenghtPossibleValues" [value]="displayLengthValue">{{displayLengthValue}}</mat-option>
             </mat-select>
         </mat-form-field>
     </div>

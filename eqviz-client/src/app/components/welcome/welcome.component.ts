@@ -11,7 +11,7 @@ export class WelcomeComponent implements OnInit {
   constructor(private settings: SettingsService) { }
 
   ngOnInit(): void {
-    this.settings.setCurrentVisualizer(0);
+    this.settings.setCurrentVisualizer('none');
   }
 
 }
