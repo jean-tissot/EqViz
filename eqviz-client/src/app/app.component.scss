@@ -2,21 +2,9 @@
   height: 100%;
 }
 
-// .drawer {
-//   width: 100px;
-// }
-
-.mat-toolbar.mat-primary {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+.drawer {
+  width: 100px;
 }
-
-.mat-sidenav,
-.mat-sidenav-content {
-  padding: 24px;
-}
-
 a {
   display: block;
   color: white;

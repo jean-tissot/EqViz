@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Analyser } from '../objects/analyser';
 import { AudioSourceService } from './audio-source.service';
+import { SettingsService } from './settings.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class AudioService {
   private Nfft = 2 ** 9; // T = Nfft/Fe (Fe=contexteAudio.sampleRate)
   private audioCtx = new window.AudioContext();
 
-  constructor(private audioSourceService: AudioSourceService) {
+  constructor(private audioSourceService: AudioSourceService, private settings: SettingsService) {
   }
 
   private getStream(): Promise<MediaStream> {
@@ -35,7 +36,7 @@ export class AudioService {
 
       var source = this.audioCtx.createMediaStreamSource(stream);
 
-      return new Analyser(source, analyser);
+      return new Analyser(source, analyser, this.settings);
     });
   }
 

@@ -9,11 +9,22 @@ import { SettingsService } from 'src/app/services/settings.service';
 export class SettingsComponent implements OnInit {
 
   currentVisualizer = 0;
+  nfftPossibleValues = [2 ** 5, 2 ** 6, 2 ** 7, 2 ** 8, 2 ** 9, 2 ** 10, 2 ** 11, 2 ** 12, 2 ** 13, 2 ** 14, 2 ** 15]
+
+  get nfft() {
+    return this.settingsService.nfft;
+  }
+
+  set nfft(value: number) {
+    this.settingsService.nfft = value;
+  }
 
   constructor(private settingsService: SettingsService) { }
 
   ngOnInit(): void {
-    this.settingsService.visualiserChange().subscribe((current: number) => this.currentVisualizer = current);
+    // Each time the visualizer changes, we update the currentVisualizer attribute in order to adapt the left side panel
+    this.settingsService.visualizerChange.subscribe(visualizerId => this.currentVisualizer = visualizerId);
   }
+
 
 }
