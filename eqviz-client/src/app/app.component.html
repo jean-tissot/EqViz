@@ -24,6 +24,7 @@
       <a class="nav-button" routerLink="/ampl-time" routerLinkActive="active">ampl./time</a>
       <a class="nav-button" routerLink="/freq-time" routerLinkActive="active">freq./time</a>
       <a class="nav-button" routerLink="/ampl-freq" routerLinkActive="active">ampl./freq.</a>
+      <button [title]="recording ? 'Sttop recording' : 'Start recording' " mat-button class="nav-button recordbutton" (click)="toggleRecording()" [ngStyle]="recording ? {'color': 'red'}: {'color':'green'}">Record</button>
     </mat-toolbar>
     <router-outlet></router-outlet>
     </mat-drawer-content>

@@ -2,6 +2,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AudioService } from './services/audio.service';
 
 @Component({
   selector: 'app-root',
@@ -15,8 +16,10 @@ export class AppComponent implements OnInit, OnDestroy {
   sideNavPinned = true;
   sideNavPinnedIfNotHandset = true;
   sideNavPinnedIfHandset = false;
+  recording = false;
 
-  constructor(private breakpointObserver: BreakpointObserver) { }
+  constructor(private breakpointObserver: BreakpointObserver,
+    private audioService: AudioService) { }
 
   ngOnInit() {
     this.screenSizeObserver = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -46,6 +49,16 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     this.sideNavPinned = isHandset ? this.sideNavPinnedIfHandset : this.sideNavPinnedIfNotHandset;
     return isHandset;
+  }
+
+  toggleRecording() {
+    if (this.recording) {
+      this.audioService.stopRecording();
+      this.recording = false;
+    } else {
+      this.audioService.startRecording();
+      this.recording = true;
+    }
   }
 }
 

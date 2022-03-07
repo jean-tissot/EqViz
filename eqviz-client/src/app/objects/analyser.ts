@@ -16,8 +16,6 @@ export class Analyser {
 
     stop() {
         this.audioSource.disconnect();
-        this.audioSource.mediaStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-        console.log("stream", this.audioSource.mediaStream.id, "stopped");
         this.nfftSubscription?.unsubscribe();
     }
 
