@@ -95,7 +95,8 @@ export class AudioService {
 
   private saveRecording(event: BlobEvent) {
     this.recordedChunks.push(event.data);
-    this.storageService.saveToDisk(event.data, "eqviz-audio-recording");
+    // TODO: add a setting to choose where recordings must be saved (to disk or to browser)
+    this.storageService.saveToBrowser(event.data, "eqviz-audio-recording");
     console.log("Saving audio file...");
   }
 
