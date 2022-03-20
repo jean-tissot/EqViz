@@ -19,18 +19,22 @@ export class StorageService {
         }
     }
 
+    /**
+     * Gets the EqvizStorage db, and creates it if necessary
+     */
     private requestDB() : Promise<IDBDatabase> {
         return new Promise((resolve, reject) => {
             if(window.indexedDB) {
-                console.log("Requesting the indexed DB");
+                console.log("Requesting the EqVizStorage indexed DB");
                 var request = window.indexedDB.open(StorageService.dbName, StorageService.dbVersion);
                 request.onupgradeneeded = event => this.initDB((event.target as any).result);
                 request.onsuccess = () => {
-                    this.db = request.result;
-                    this.checkDBAudioTable(this.db);
-                    // TODO: add the this.db.onerror callback (if error code VER_ERR → call this.initDb())
-                    resolve(this.db);
+                    this.checkDBOk(request.result).then(db => {
+                        this.db = db;
+                        resolve(db);
+                    })
                 }
+                // TODO: if error is VersionError we might delete the database and call requestDB again
                 request.onerror = reject;
             } else {
                 reject();
@@ -39,21 +43,28 @@ export class StorageService {
     }
 
     private initDB(db: IDBDatabase) {
-        console.log("Checking if the audio table exists in the indexed DB");
+        console.log("Creating the audio table in the EqVizStorage db");
         var objectStore = db.createObjectStore(StorageService.dbAudioTable, {keyPath: StorageService.dbAudioKeyName, autoIncrement: true});
-        objectStore.createIndex("name", "name", {unique: false});
+        // TODO: do we need an index on the file name attribute ? → objectStore.createIndex("name", "name", {unique: false});
         objectStore.transaction.oncomplete = () => console.log("Audio table created");
     }
 
-    private checkDBAudioTable(db: IDBDatabase) {
-        // TODO: transaction must be in "versionUpdate" mode
+    /**
+     * Checkes if the db contains the audio table.
+     * @returns the given db if ok, else the db from a new requestDB call
+     */
+    private checkDBOk(db: IDBDatabase) {
         if(!db.objectStoreNames.contains(StorageService.dbAudioTable)) {
-            // var objectStore = db.createObjectStore(StorageService.dbAudioTable, {keyPath: StorageService.dbAudioKeyName, autoIncrement: true});
-            // objectStore.createIndex("name", "name", {unique: false});
-            // objectStore.transaction.oncomplete = () => console.log("Audio table created");
+            indexedDB.deleteDatabase(StorageService.dbName);
+            return this.requestDB();
+        } else {
+            return Promise.resolve(db);
         }
     }
 
+    /**
+     * Gets the EqVizStorage db (makes the request if necessary) 
+     */
     private getDB(): Promise<IDBDatabase> {
         if(this.db) {
             return Promise.resolve(this.db);
