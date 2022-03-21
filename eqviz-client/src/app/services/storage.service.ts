@@ -23,27 +23,49 @@ export class StorageService {
         return new File([], "");
     }
 
-    saveToBrowser(file: Blob, name: string) {
-        this.dbService.getDB().then(db => {
-            var transaction = db.transaction(IndexedDBService.dbAudioTable, "readwrite");
-            transaction.onerror = (err) => this.saveToDiskInErrorCase(file, name, err);
-            var request = transaction.objectStore(IndexedDBService.dbAudioTable).add(new File([file], name));
-            request.onsuccess = () => console.log("File %s saved to the browser", name);
-            request.onerror = (err) => this.saveToDiskInErrorCase(file, name, err);
-        }).catch(error => {
-            console.log(error);
-            alert("Cannot access the indexed DB. It may be because you didn't authorize it. Saving to the disk...");
-            this.saveToDisk(file, name);
-        })
-        // TODO: return a Promise encapsulating the id of the file created
+    saveToBrowser(file: Blob, name: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            this.dbService.getDB().then(db => {
+                var transaction = db.transaction(IndexedDBService.dbAudioTable, "readwrite");
+                transaction.onerror = (err) => this.saveToDiskInErrorCase(file, name, err);
+                var request = transaction.objectStore(IndexedDBService.dbAudioTable).add(new File([file], name));
+                request.onsuccess = () => {
+                    console.log("File %s saved to the browser with id %s", name, request.result);
+                    resolve(request.result.toString());
+                }
+                request.onerror = (err) => {
+                    this.saveToDiskInErrorCase(file, name, err);
+                    reject(err);
+                }
+            }).catch(error => {
+                console.log(error);
+                alert("Cannot access the indexed DB. It may be because you didn't authorize it. Saving to the disk...");
+                this.saveToDisk(file, name);
+            });
+        });
     }
 
-    getSavedFiles(): Promise<Map<number, string>[]> {
-        // TODO: return list of saved file (key: id, value: filename)
-        return Promise.resolve([]);
+    getSavedFiles(): Promise<Map<string, File>> {
+        return new Promise((resolve, reject) => {
+            this.dbService.getDB().then(db => {
+                var transaction = db.transaction(IndexedDBService.dbAudioTable, "readonly");
+                var objectStore = transaction.objectStore(IndexedDBService.dbAudioTable);
+                var keys = objectStore.getAllKeys();
+                var result = new Map<string, File>();
+                keys.onsuccess = () => {
+                    console.log(keys.result);
+                    keys.result.forEach(key => {
+                        var request = objectStore.get(key);
+                        request.onsuccess = () => result.set(key.toString(), request.result);
+                    });
+                }
+                transaction.oncomplete = () => resolve(result);
+                transaction.onerror = (error) => reject(error);
+            })
+        });
     }
 
-    getSavedFile(id: number): File {
+    getSavedFile(id: string): File {
         // TODO: return the file with the given id
         return new File([], "");
     }
