@@ -1,13 +1,22 @@
 <div id="list">
+    <h3>Recordings</h3>
+    <label for="saveTo">Save to :</label>
+    <mat-form-field id="saveTo">
+        <mat-select [(value)]="settingsService.saveToDisk">
+            <mat-option *ngFor="let saveToDisk of [false, true]" [value]="saveToDisk">{{saveToDisk ? 'disk' : 'browser'}}</mat-option>
+        </mat-select>
+    </mat-form-field>
     <div *ngIf="currentVisualizer!='none'">
+        <h3>Display</h3>
         <label for="nfft">Nfft :</label>
         <mat-form-field id="nfft">
             <mat-select [(value)]="settingsService.nfft">
                 <mat-option *ngFor="let nfftValue of nfftPossibleValues" [value]="nfftValue">{{nfftValue}}</mat-option>
             </mat-select>
         </mat-form-field>
+    </div>
     <div *ngIf="currentVisualizer=='spack' || currentVisualizer=='freq-time'">
-        <label for="length">Display length :</label>
+        <label for="length">Length :</label>
         <mat-form-field id="length">
             <mat-select [(value)]="settingsService.displayLength">
                 <mat-option *ngFor="let displayLengthValue of displayLenghtPossibleValues" [value]="displayLengthValue">{{displayLengthValue}}</mat-option>

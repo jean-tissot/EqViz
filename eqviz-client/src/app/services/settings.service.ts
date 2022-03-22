@@ -41,6 +41,8 @@ export class SettingsService {
         return this.displayLengthChange.getValue();
     }
 
+    saveToDisk = false;
+
 
     /**Changes the current visualizer */
     setCurrentVisualizer(current: Visualizer) {
