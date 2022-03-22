@@ -77,12 +77,11 @@ export class StorageService {
     }
 
     saveSetting(key: string, value: string) {
-        // TODO: save to local storage ?
+        localStorage.setItem(key, value);
     }
 
     getSetting(key: string): string | null {
-        // TODO: get from local storage
-        return null;
+        return localStorage.getItem(key);
     }
 
 }
