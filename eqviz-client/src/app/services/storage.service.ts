@@ -45,6 +45,13 @@ export class StorageService {
         });
     }
 
+    /**
+     * Gets all the files saved in the browser (EqVizStorage/AudioTable)
+     * TODO: It would be better to return a Map with File names as values (and ids as key)
+     * and to use the {@link getSavedFile} method to get only the File needed, when it is necessary
+     * 
+     * @returns A {@link Map} with Files as values and File ids as keys
+     */
     getSavedFiles(): Promise<Map<string, File>> {
         return new Promise((resolve, reject) => {
             this.dbService.getDB().then(db => {

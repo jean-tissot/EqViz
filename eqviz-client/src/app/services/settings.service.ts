@@ -12,19 +12,22 @@ export class SettingsService {
 
     private visualizers: Visualizer[] = ['none', 'spack', 'ampl-time', 'ampl-freq', 'freq-time'];
 
+    /** The nfft to use for each visualizer */
     private nfftValues: Settings;
+    /** The display length to use for the spacke and freq/time visualizers */
     private displayLengthValues: Settings;
+    /** Indicates if audio recording must be saved to the disk or the browser (1 → to disk, 0 → to browser) */
     private mustSaveToDisk: Settings;
 
     constructor(private storage: StorageService) {
         
         var defaultNfftValues = {'spack': 512, 'ampl-time': 4096, 'freq-time': 128, 'ampl-freq': 2048};
         var defaultDisplayLengthValues = { 'spack': 100, 'freq-time': 100 };
-        var defalutSaveToDisk = {'none' : 0};
+        var defaultSaveToDisk = {'none' : 0};
 
         this.nfftValues = this.loadSetting('nfft', defaultNfftValues);
         this.displayLengthValues = this.loadSetting('display-length', defaultDisplayLengthValues);
-        this.mustSaveToDisk = this.loadSetting('save-to-disk', defalutSaveToDisk);
+        this.mustSaveToDisk = this.loadSetting('save-to-disk', defaultSaveToDisk);
     }
 
     /** You can subscribe to visualizerChange with the function to call on visualizer change */
@@ -62,7 +65,7 @@ export class SettingsService {
 
     set saveToDisk(toDisk: boolean) {
         this.mustSaveToDisk['none'] = toDisk ? 1 : 0;
-        this.saveSetting('save-to-disk', this.visualizerChange.getValue(), toDisk ? 1 : 0);
+        this.saveSetting('save-to-disk', 'none', toDisk ? 1 : 0);
     }
 
 
@@ -83,16 +86,29 @@ export class SettingsService {
         }
     }
 
-    private saveSetting(key: string, visualizer: string, setting: number) {
-        this.storage.saveSetting(key + "-" + visualizer, setting.toString());
+    /**
+     * 
+     * @param settingName The name of the setting to save (e.g: 'nfft' for a nfft value)
+     * @param visualizer The visualizer concerned by the setting
+     * @param value The value of the setting to save
+     */
+    private saveSetting(settingName: string, visualizer: Visualizer, value: number) {
+        this.storage.saveSetting(this.getSettingKey(settingName, visualizer), value.toString());
     }
 
-    private loadSetting(key: string, setting: Settings): Settings {
+    /**
+     * 
+     * @param settingName The name of the setting to load (e.g: 'nfft' for the nfft values)
+     * @param defaultValues The values to use by default (when not present in the localstorage)
+     * @returns The {@link Settings} object formed with the values of the localstorage, and the
+     * default values for those not present in the localstorage
+     */
+    private loadSetting(settingName: string, defaultValues: Settings): Settings {
         var ret: Settings = {};
         this.visualizers.forEach(visualizer => {
-            var value = setting[visualizer];
+            var value = defaultValues[visualizer];
             if(value !== undefined) {
-                var storageSetting: number | undefined = Number(this.storage.getSetting(key + "-" + visualizer));
+                var storageSetting: number | undefined = Number(this.storage.getSetting(this.getSettingKey(settingName, visualizer)));
                 if(isNaN(storageSetting)) {
                     storageSetting = undefined
                 }
@@ -100,6 +116,15 @@ export class SettingsService {
             }
         });
         return ret;
+    }
+
+    /**
+     * Computes the key to use in the localstorage to store a setting for the given visualizer
+     * @param settingName The name of the setting to save/load
+     * @param visualizer The visualizer to save/load the setting for
+     */
+    private getSettingKey(settingName: string, visualizer: Visualizer) {
+        return visualizer === 'none' ? settingName : settingName + "-" + visualizer;
     }
 
 
