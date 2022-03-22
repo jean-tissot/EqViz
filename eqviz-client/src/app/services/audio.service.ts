@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Analyser } from '../objects/analyser';
-import { Visualizer } from '../objects/types';
+import { AudioSource, Visualizer } from '../objects/types';
 import { AudioSourceService } from './audio-source.service';
 import { SettingsService } from './settings.service';
 import { StorageService } from './storage.service';
@@ -11,7 +11,7 @@ import { StorageService } from './storage.service';
 export class AudioService {
 
   // TODO: add source type to objects folder - add other possible sources in source type
-  private source: 'mic' = 'mic';
+  private source: AudioSource = 'mike';
   private audioCtx = new window.AudioContext();
   private audioSource?: MediaStreamAudioSourceNode;
   private recording = false;
@@ -28,7 +28,7 @@ export class AudioService {
   }
 
   private getNewStream(): Promise<MediaStream> {
-    if (this.source == 'mic') {
+    if (this.source == 'mike') {
       return this.audioSourceService.getMicStream();
     } else {
       return this.audioSourceService.getVoidStream();

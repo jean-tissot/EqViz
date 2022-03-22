@@ -1,4 +1,13 @@
 <div id="list">
+
+    <h3>Audio</h3>
+    <label for="source">Source</label>
+    <mat-form-field id="source">
+        <mat-select [(value)]="settingsService.audioSource">
+            <mat-option *ngFor="let source of possiblesAudioSources" [value]="source">{{source}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
     <h3>Recordings</h3>
     <label for="saveTo">Save to :</label>
     <mat-form-field id="saveTo">
@@ -6,6 +15,7 @@
             <mat-option *ngFor="let saveToDisk of [false, true]" [value]="saveToDisk">{{saveToDisk ? 'disk' : 'browser'}}</mat-option>
         </mat-select>
     </mat-form-field>
+
     <div *ngIf="currentVisualizer!='none'">
         <h3>Display</h3>
         <label for="nfft">Nfft :</label>
@@ -15,6 +25,7 @@
             </mat-select>
         </mat-form-field>
     </div>
+
     <div *ngIf="currentVisualizer=='spack' || currentVisualizer=='freq-time'">
         <label for="length">Length :</label>
         <mat-form-field id="length">
@@ -23,4 +34,5 @@
             </mat-select>
         </mat-form-field>
     </div>
+
 </div>

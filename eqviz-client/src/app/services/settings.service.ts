@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
-import { Settings, Visualizer } from "../objects/types";
+import { AudioSource, Settings, Visualizer } from "../objects/types";
 import { StorageService } from "./storage.service";
 
 @Injectable({
@@ -18,16 +18,20 @@ export class SettingsService {
     private displayLengthValues: Settings;
     /** Indicates if audio recording must be saved to the disk or the browser (1 → to disk, 0 → to browser) */
     private mustSaveToDisk: Settings;
+    /** The audio source */
+    private useMikeAsSource: Settings;
 
     constructor(private storage: StorageService) {
         
         var defaultNfftValues = {'spack': 512, 'ampl-time': 4096, 'freq-time': 128, 'ampl-freq': 2048};
         var defaultDisplayLengthValues = { 'spack': 100, 'freq-time': 100 };
-        var defaultSaveToDisk = {'none' : 0};
+        var defaultSaveToDisk = {'none' : 0}; // by default we doesn't save recordings to disk (but to browser)
+        var defaultUseMikeAsSource = {'none' : 1}; // by default we use the microphone as audio source
 
         this.nfftValues = this.loadSetting('nfft', defaultNfftValues);
         this.displayLengthValues = this.loadSetting('display-length', defaultDisplayLengthValues);
         this.mustSaveToDisk = this.loadSetting('save-to-disk', defaultSaveToDisk);
+        this.useMikeAsSource = this.loadSetting('audio-source-mike', defaultUseMikeAsSource);
     }
 
     /** You can subscribe to visualizerChange with the function to call on visualizer change */
@@ -58,14 +62,23 @@ export class SettingsService {
         return this.displayLengthChange.getValue();
     }
 
-
-    get saveToDisk(): boolean {
-        return this.mustSaveToDisk['none'] === 1;
-    }
-
     set saveToDisk(toDisk: boolean) {
         this.mustSaveToDisk['none'] = toDisk ? 1 : 0;
         this.saveSetting('save-to-disk', 'none', toDisk ? 1 : 0);
+    }
+
+    get saveToDisk(): boolean {
+        return this.mustSaveToDisk['none'] == 1;
+    }
+
+    set audioSource(source: AudioSource) {
+        this.useMikeAsSource['none'] = (source == 'mike') ? 1 : 0;
+        this.saveSetting('audio-source-mike', 'none', this.useMikeAsSource['none']);
+    }
+
+    get audioSource() {
+        // console.log(this.useMikeAsSource['none'] == 1 ? 'mike': 'recordings')
+        return (this.useMikeAsSource['none'] == 1) ? 'mike' : 'recordings';
     }
 
 
@@ -108,11 +121,13 @@ export class SettingsService {
         this.visualizers.forEach(visualizer => {
             var value = defaultValues[visualizer];
             if(value !== undefined) {
-                var storageSetting: number | undefined = Number(this.storage.getSetting(this.getSettingKey(settingName, visualizer)));
-                if(isNaN(storageSetting)) {
-                    storageSetting = undefined
+                var storageSetting =this.storage.getSetting(this.getSettingKey(settingName, visualizer));
+                console.log(settingName, storageSetting, value);
+                if(storageSetting == null || isNaN(Number(storageSetting))) {
+                    ret[visualizer] = value;
+                } else {
+                    ret[visualizer] = Number(storageSetting);
                 }
-                ret[visualizer] = +(storageSetting || value);
             }
         });
         return ret;
