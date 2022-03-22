@@ -92,7 +92,11 @@ export class SettingsService {
         this.visualizers.forEach(visualizer => {
             var value = setting[visualizer];
             if(value !== undefined) {
-                ret[visualizer] = +(this.storage.getSetting(key + "-" + visualizer) || value);
+                var storageSetting: number | undefined = Number(this.storage.getSetting(key + "-" + visualizer));
+                if(isNaN(storageSetting)) {
+                    storageSetting = undefined
+                }
+                ret[visualizer] = +(storageSetting || value);
             }
         });
         return ret;
