@@ -6,7 +6,7 @@ export class Analyser {
     nfftSubscription?: Subscription;
 
     constructor(
-        private audioSource: MediaStreamAudioSourceNode,
+        private audioSource: AudioNode,
         private analyserNode: AnalyserNode,
         settings: SettingsService
     ) {

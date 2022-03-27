@@ -7,6 +7,11 @@
             <mat-option *ngFor="let source of possiblesAudioSources" [value]="source">{{source}}</mat-option>
         </mat-select>
     </mat-form-field>
+    <div *ngIf="settingsService.audioSource=='recordings'">
+        <mat-select [(value)]="settingsService.selectedRecording">
+            <mat-option *ngFor="let file of settingsService.recordings | keyvalue" [value]="file.key">{{file.value.name}}</mat-option>
+        </mat-select>
+    </div> 
 
     <h3>Recordings</h3>
     <label for="saveTo">Save to :</label>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Analyser } from '../objects/analyser';
-import { AudioSource, Visualizer } from '../objects/types';
+import { Visualizer } from '../objects/types';
 import { AudioSourceService } from './audio-source.service';
 import { SettingsService } from './settings.service';
 import { StorageService } from './storage.service';
@@ -10,9 +10,7 @@ import { StorageService } from './storage.service';
 })
 export class AudioService {
 
-  // TODO: add source type to objects folder - add other possible sources in source type
-  private source: AudioSource = 'mike';
-  private audioCtx = new window.AudioContext();
+  private audioCtx = new AudioContext();
   private audioSource?: MediaStreamAudioSourceNode;
   private recording = false;
   private mediaRecorder?: MediaRecorder;
@@ -28,7 +26,7 @@ export class AudioService {
   }
 
   private getNewStream(): Promise<MediaStream> {
-    if (this.source == 'mike') {
+    if (this.settings.audioSource == 'mike') {
       return this.audioSourceService.getMicStream();
     } else {
       return this.audioSourceService.getVoidStream();
@@ -54,8 +52,20 @@ export class AudioService {
     }
   }
 
-  public startAnalyser(): Promise<Analyser> {
-    return this.getSource().then((audioSource: MediaStreamAudioSourceNode) => {
+  private async getFileSource(file: File): Promise<AudioBufferSourceNode> {
+    const source = this.audioCtx.createBufferSource();
+    const arrayBuffer = await file.arrayBuffer();
+    const audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
+    source.buffer = audioBuffer;
+    return source;
+  }
+
+  public async startAnalyser(): Promise<Analyser> {
+    var file = this.settings.selectedRecording;
+    console.log(file);
+    var source = this.settings.audioSource == 'recordings' && file ?
+        this.getFileSource(file) : this.getSource();
+    return source.then((audioSource: AudioNode) => {
 
       var analyser = this.audioCtx.createAnalyser();
       analyser.smoothingTimeConstant = 0;
@@ -103,7 +113,5 @@ export class AudioService {
     }
     console.log("Saving audio file...");
   }
-
-  // TODO: Add setSource method
 
 }

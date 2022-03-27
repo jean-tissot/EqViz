@@ -21,6 +21,9 @@ export class SettingsService {
     /** The audio source */
     private useMikeAsSource: Settings;
 
+    recordings: Map<string, File> = new Map();
+    selectedRecording?: File;
+
     constructor(private storage: StorageService) {
         
         var defaultNfftValues = {'spack': 512, 'ampl-time': 4096, 'freq-time': 128, 'ampl-freq': 2048};
@@ -32,6 +35,13 @@ export class SettingsService {
         this.displayLengthValues = this.loadSetting('display-length', defaultDisplayLengthValues);
         this.mustSaveToDisk = this.loadSetting('save-to-disk', defaultSaveToDisk);
         this.useMikeAsSource = this.loadSetting('audio-source-mike', defaultUseMikeAsSource);
+
+        storage.getSavedFiles().then(files => {
+            this.recordings = files;
+            if(this.selectedRecording == undefined && files.size>0) {
+                this.selectedRecording = files.values().next().value;
+            }
+        });
     }
 
     /** You can subscribe to visualizerChange with the function to call on visualizer change */
@@ -77,7 +87,6 @@ export class SettingsService {
     }
 
     get audioSource() {
-        // console.log(this.useMikeAsSource['none'] == 1 ? 'mike': 'recordings')
         return (this.useMikeAsSource['none'] == 1) ? 'mike' : 'recordings';
     }
 

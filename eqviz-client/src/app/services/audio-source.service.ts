@@ -33,6 +33,10 @@ export class AudioSourceService {
     return navigator.mediaDevices.getUserMedia({ video: false, audio: true });
   }
 
+  public getFileStream(audioFile: File) {
+    // return new MediaStream(audioFile.stream());
+  }
+
   public getVoidStream(): Promise<MediaStream> {
     var stream = new MediaStream();
     return new Promise(() => stream);
