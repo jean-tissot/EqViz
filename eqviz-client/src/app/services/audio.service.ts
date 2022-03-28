@@ -49,7 +49,7 @@ export class AudioService {
     var source;
     if (this.settings.audioSource == 'recordings' && file) {
       source = await this.audioSourceService.getFileSource(file)
-      // TODO: Play the source in the speakers
+      source.connect(this.audioSourceService.audioCtx.destination);
       source.start();
       console.log("Starting to play the file " + file.name + " (id: " + fileId + ")");
       this.currentSource = new AudioSource(source, 'recordings', fileId);
@@ -107,7 +107,7 @@ export class AudioService {
 
   private saveRecording(event: BlobEvent) {
     this.recordedChunks.push(event.data);
-    // TODO: make the filename non constant (use the date and time ?)
+    // TODO: simplify the filename ?
     var filename = new Date().toDateString() + " - recording";
     if(this.settings.saveToDisk) {
       this.storageService.saveToDisk(event.data, filename);
