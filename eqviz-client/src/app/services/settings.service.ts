@@ -22,7 +22,7 @@ export class SettingsService {
     private useMikeAsSource: Settings;
 
     recordings: Map<string, File> = new Map();
-    private _selectedRecording?: File;
+    private _selectedRecordingId?: string;
 
     constructor(private storage: StorageService) {
         
@@ -47,13 +47,14 @@ export class SettingsService {
     displayLengthChange = new BehaviorSubject<number>(0);
     // TODO: subscribe to this to display the name of the selected recording in the navbar, and a button to play it
     /** You can subscribe to audioSourceChange with the function to call when the user changes the selected audio source */
-    audioSourceChange = new BehaviorSubject<File | undefined>(undefined);
+    audioSourceChange = new BehaviorSubject<string | undefined>(undefined);
 
     async loadRecordings() {
         this.recordings = await this.storage.getSavedFiles();
-        if(this.selectedRecording == undefined && this.recordings.size>0) {
-            this.selectedRecording = this.recordings.values().next().value;
-            console.log("selected is " , this.selectedRecording)
+        if(this.selectedRecordingId == undefined && this.recordings.size>0) {
+            // TODO: we should save the value of the selected file
+            this.selectedRecordingId = this.recordings.keys().next().value;
+            console.log("selected is " , this.selectedRecordingId)
         }
     }
 
@@ -93,17 +94,25 @@ export class SettingsService {
         if(source == 'mike') {
             this.audioSourceChange.next(undefined);
         } else {
-            this.audioSourceChange.next(this._selectedRecording);
+            this.audioSourceChange.next(this._selectedRecordingId);
         }
     }
 
-    get selectedRecording(): File | undefined {
-        return this._selectedRecording;
+    get selectedRecordingId(): string | undefined {
+        return this._selectedRecordingId;
     }
 
-    set selectedRecording(recording: File | undefined) {
-        this._selectedRecording = recording;
-        this.audioSourceChange.next(recording);
+    set selectedRecordingId(id: string | undefined) {
+        this._selectedRecordingId = id;
+        this.audioSourceChange.next(id);
+    }
+
+    get selectedRecording(): File | undefined {
+        return this._selectedRecordingId ? this.recordings.get(this._selectedRecordingId) : undefined;
+    }
+
+    getRecording(id: string) {
+        return this.recordings.get(id);
     }
 
     get audioSource() {

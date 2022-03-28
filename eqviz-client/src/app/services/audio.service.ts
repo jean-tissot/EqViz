@@ -37,24 +37,24 @@ export class AudioService {
   /** Gets the source to use for the analyser (creating a new source only if the selection has change in the interface) */
   private async getSource(): Promise<AudioNode> {
     // We keep the current source if possible
-    // TODO: we should stock the information of the source type in the AudioSource object instead of testing the sourceNode type
-    if(this.currentSource?.sourceNode instanceof MediaStreamAudioSourceNode && this.settings.audioSource == 'mike') {
+    if(this.currentSource?.type == 'mike' && this.settings.audioSource == 'mike') {
       return Promise.resolve(this.currentSource.sourceNode);
     }
-    if(this.currentSource?.sourceNode instanceof AudioBufferSourceNode && (this.settings.selectedRecording as any).id == this.currentSource.recordingKey) {
+    if(this.currentSource?.type == 'recordings' && this.settings.audioSource == 'recordings'
+        && this.settings.selectedRecordingId == this.currentSource.recordingKey) {
       return Promise.resolve(this.currentSource.sourceNode);
     }
     var file = this.settings.selectedRecording;
+    var fileId = this.settings.selectedRecordingId;
     var source;
     if (this.settings.audioSource == 'recordings' && file) {
       source = await this.audioSourceService.getFileSource(file)
       source.start();
-      console.log("Starting to play the file " + file.name + " (id: " + (file as any).id + ")");
-      // TODO: we should use the key of this.settings.audioSource → this.settings.selectedRecording = key
-      this.currentSource = new AudioSource(source, (file as any).id);
+      console.log("Starting to play the file " + file.name + " (id: " + fileId + ")");
+      this.currentSource = new AudioSource(source, 'recordings', fileId);
     } else {
       source = await this.audioSourceService.getMicSource();
-      this.currentSource = new AudioSource(source, undefined);
+      this.currentSource = new AudioSource(source, 'mike', undefined);
     }
     return source;
   }
