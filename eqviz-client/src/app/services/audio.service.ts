@@ -28,11 +28,17 @@ export class AudioService {
     this.audioSourceService.stopMicStream();
   }
 
-  private getSource() {
+  private async getSource() {
     var file = this.settings.selectedRecording;
     console.log(file);
-    return this.settings.audioSource == 'recordings' && file ?
-        this.audioSourceService.getFileSource(file) : this.audioSourceService.getMicSource();
+    var source;
+    if (this.settings.audioSource == 'recordings' && file) {
+      source = await this.audioSourceService.getFileSource(file)
+      source.start();
+    } else {
+      source = await this.audioSourceService.getMicSource();
+    }
+    return source;
   }
 
   public async startAnalyser(): Promise<Analyser> {
