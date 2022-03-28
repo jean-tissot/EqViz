@@ -9,7 +9,7 @@
     </mat-form-field>
     <div *ngIf="settingsService.audioSource=='recordings'">
         <mat-select [(value)]="settingsService.selectedRecording">
-            <mat-option *ngFor="let file of settingsService.recordings | keyvalue" [value]="file.key">{{file.value.name}}</mat-option>
+            <mat-option *ngFor="let file of settingsService.recordings | keyvalue" [value]="file.value">{{file.value.name}}</mat-option>
         </mat-select>
     </div> 
 

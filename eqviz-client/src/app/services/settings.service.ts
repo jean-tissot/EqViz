@@ -36,12 +36,7 @@ export class SettingsService {
         this.mustSaveToDisk = this.loadSetting('save-to-disk', defaultSaveToDisk);
         this.useMikeAsSource = this.loadSetting('audio-source-mike', defaultUseMikeAsSource);
 
-        storage.getSavedFiles().then(files => {
-            this.recordings = files;
-            if(this.selectedRecording == undefined && files.size>0) {
-                this.selectedRecording = files.values().next().value;
-            }
-        });
+        this.loadRecordings();
     }
 
     /** You can subscribe to visualizerChange with the function to call on visualizer change */
@@ -50,6 +45,14 @@ export class SettingsService {
     nfftChange = new BehaviorSubject<number>(0);
     /** You can subscribe to displayLengthChange with the function to call on displayLength change */
     displayLengthChange = new BehaviorSubject<number>(0);
+
+    async loadRecordings() {
+        this.recordings = await this.storage.getSavedFiles();
+        if(this.selectedRecording == undefined && this.recordings.size>0) {
+            this.selectedRecording = this.recordings.values().next().value;
+            console.log("selected is " , this.selectedRecording)
+        }
+    }
 
 
     set nfft(value: number) {

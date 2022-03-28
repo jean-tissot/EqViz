@@ -77,7 +77,8 @@ export class AudioService {
     if(this.settings.saveToDisk) {
       this.storageService.saveToDisk(event.data, "eqviz-audio-recording");
     } else {
-      this.storageService.saveToBrowser(event.data, "eqviz-audio-recording");
+      this.storageService.saveToBrowser(event.data, "eqviz-audio-recording")
+          .then(() => this.settings.loadRecordings());
     }
     console.log("Saving audio file...");
   }

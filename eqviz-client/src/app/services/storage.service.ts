@@ -41,6 +41,7 @@ export class StorageService {
                 console.log(error);
                 alert("Cannot access the indexed DB. It may be because you didn't authorize it. Saving to the disk...");
                 this.saveToDisk(file, name);
+                reject(error);
             });
         });
     }
