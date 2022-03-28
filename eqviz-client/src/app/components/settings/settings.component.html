@@ -1,6 +1,43 @@
-<mat-nav-list>
-    <a mat-list-item href="#">Setting 1</a>
-    <a mat-list-item href="#">Setting 2</a>
-    <a mat-list-item href="#">Setting 3</a>
-</mat-nav-list>
+<div id="list">
 
+    <h3>Audio</h3>
+    <label for="source">Source</label>
+    <mat-form-field id="source">
+        <mat-select [(value)]="settingsService.audioSource">
+            <mat-option *ngFor="let source of possiblesAudioSources" [value]="source">{{source}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <div *ngIf="settingsService.audioSource=='recordings'">
+        <mat-select [(value)]="settingsService.selectedRecordingId">
+            <mat-option *ngFor="let file of settingsService.recordings | keyvalue" [value]="file.key">{{file.value.name}}</mat-option>
+        </mat-select>
+    </div> 
+
+    <h3>Recordings</h3>
+    <label for="saveTo">Save to :</label>
+    <mat-form-field id="saveTo">
+        <mat-select [(value)]="settingsService.saveToDisk">
+            <mat-option *ngFor="let saveToDisk of [false, true]" [value]="saveToDisk">{{saveToDisk ? 'disk' : 'browser'}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <div *ngIf="currentVisualizer!='none'">
+        <h3>Display</h3>
+        <label for="nfft">Nfft :</label>
+        <mat-form-field id="nfft">
+            <mat-select [(value)]="settingsService.nfft">
+                <mat-option *ngFor="let nfftValue of nfftPossibleValues" [value]="nfftValue">{{nfftValue}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <div *ngIf="currentVisualizer=='spack' || currentVisualizer=='freq-time'">
+        <label for="length">Length :</label>
+        <mat-form-field id="length">
+            <mat-select [(value)]="settingsService.displayLength">
+                <mat-option *ngFor="let displayLengthValue of displayLenghtPossibleValues" [value]="displayLengthValue">{{displayLengthValue}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+</div>
