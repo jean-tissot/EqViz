@@ -5,6 +5,9 @@ import { Injectable } from '@angular/core';
 })
 export class AudioSourceService {
 
+  audioCtx = new AudioContext();
+  private micAudioSource?: MediaStreamAudioSourceNode;
+
   constructor() {
     // Some browsers partially implement mediaDevices. We can't just assign an object
     // with getUserMedia as it would overwrite existing properties.
@@ -29,14 +32,40 @@ export class AudioSourceService {
     }
   }
 
-  public getMicStream(): Promise<MediaStream> {
+  private getNewMicStream() {
     return navigator.mediaDevices.getUserMedia({ video: false, audio: true });
   }
 
-  public getFileStream(audioFile: File) {
-    // return new MediaStream(audioFile.stream());
+
+  public getMicSource(): Promise<MediaStreamAudioSourceNode> {
+    if (this.micAudioSource && this.micAudioSource?.mediaStream.active) {
+      return Promise.resolve(this.micAudioSource);
+    } else {
+      return this.getNewMicStream().then((stream: MediaStream) => {
+        console.log("stream", stream.id, "started");
+        this.micAudioSource = this.audioCtx.createMediaStreamSource(stream);
+        return this.micAudioSource;
+      });
+    }
   }
 
+  public stopMicStream() {
+    this.micAudioSource?.disconnect();
+    this.micAudioSource?.mediaStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+    console.log("stream", this.micAudioSource?.mediaStream.id, "stopped");
+    this.micAudioSource = undefined;
+  }
+
+
+  public async getFileSource(file: File): Promise<AudioBufferSourceNode> {
+    const source = this.audioCtx.createBufferSource();
+    const arrayBuffer = await file.arrayBuffer();
+    const audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
+    source.buffer = audioBuffer;
+    return source;
+  }
+
+  
   public getVoidStream(): Promise<MediaStream> {
     var stream = new MediaStream();
     return new Promise(() => stream);

@@ -10,8 +10,6 @@ import { StorageService } from './storage.service';
 })
 export class AudioService {
 
-  private audioCtx = new AudioContext();
-  private audioSource?: MediaStreamAudioSourceNode;
   private recording = false;
   private mediaRecorder?: MediaRecorder;
   private recordedChunks: Blob[] = [];
@@ -25,61 +23,31 @@ export class AudioService {
     })
   }
 
-  private getNewStream(): Promise<MediaStream> {
-    if (this.settings.audioSource == 'mike') {
-      return this.audioSourceService.getMicStream();
-    } else {
-      return this.audioSourceService.getVoidStream();
-    }
+  public stop() {
+    // TODO: stop the current source
+    this.audioSourceService.stopMicStream();
   }
 
-  private stop() {
-    this.audioSource?.disconnect();
-    this.audioSource?.mediaStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-    console.log("stream", this.audioSource?.mediaStream.id, "stopped");
-    this.audioSource = undefined;
-  }
-
-  private getSource(): Promise<MediaStreamAudioSourceNode> {
-    if (this.audioSource && this.audioSource?.mediaStream.active) {
-      return Promise.resolve(this.audioSource);
-    } else {
-      return this.getNewStream().then((stream: MediaStream) => {
-        console.log("stream", stream.id, "started");
-        this.audioSource = this.audioCtx.createMediaStreamSource(stream);
-        return this.audioSource;
-      });
-    }
-  }
-
-  private async getFileSource(file: File): Promise<AudioBufferSourceNode> {
-    const source = this.audioCtx.createBufferSource();
-    const arrayBuffer = await file.arrayBuffer();
-    const audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
-    source.buffer = audioBuffer;
-    return source;
+  private getSource() {
+    var file = this.settings.selectedRecording;
+    console.log(file);
+    return this.settings.audioSource == 'recordings' && file ?
+        this.audioSourceService.getFileSource(file) : this.audioSourceService.getMicSource();
   }
 
   public async startAnalyser(): Promise<Analyser> {
-    var file = this.settings.selectedRecording;
-    console.log(file);
-    var source = this.settings.audioSource == 'recordings' && file ?
-        this.getFileSource(file) : this.getSource();
-    return source.then((audioSource: AudioNode) => {
-
-      var analyser = this.audioCtx.createAnalyser();
-      analyser.smoothingTimeConstant = 0;
-      analyser.fftSize = this.settings.nfft;
-
-      return new Analyser(audioSource, analyser, this.settings);
-    });
+    const audioSource = await this.getSource();
+    var analyser = this.audioSourceService.audioCtx.createAnalyser();
+    analyser.smoothingTimeConstant = 0;
+    analyser.fftSize = this.settings.nfft;
+    return new Analyser(audioSource, analyser, this.settings);
   }
 
   public startRecording() {
     if (this.recording) return
     this.recording = true;
     this.recordedChunks = [];
-    this.getSource().then((audioSource: MediaStreamAudioSourceNode) => {
+    this.audioSourceService.getMicSource().then((audioSource: MediaStreamAudioSourceNode) => {
       console.log("Recording...");
       this.mediaRecorder = new MediaRecorder(audioSource.mediaStream);
       this.mediaRecorder.ondataavailable = (e => this.saveRecording(e));
