@@ -37,15 +37,14 @@ export class AudioSourceService {
   }
 
 
-  public getMicSource(): Promise<MediaStreamAudioSourceNode> {
+  public async getMicSource(): Promise<MediaStreamAudioSourceNode> {
     if (this.micAudioSource && this.micAudioSource?.mediaStream.active) {
       return Promise.resolve(this.micAudioSource);
     } else {
-      return this.getNewMicStream().then((stream: MediaStream) => {
-        console.log("stream", stream.id, "started");
-        this.micAudioSource = this.audioCtx.createMediaStreamSource(stream);
-        return this.micAudioSource;
-      });
+      const stream = await this.getNewMicStream();
+      console.log("stream", stream.id, "started");
+      this.micAudioSource = this.audioCtx.createMediaStreamSource(stream);
+      return this.micAudioSource;
     }
   }
 

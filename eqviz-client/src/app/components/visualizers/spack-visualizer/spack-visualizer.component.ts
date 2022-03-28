@@ -21,6 +21,7 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
   private ctxCanvas?: CanvasRenderingContext2D;
   private drawer?: Drawer;
   private displayLengthSupscritpion?: Subscription;
+  private audioChangeSubscription?: Subscription;
 
   constructor(private audioService: AudioService, private settings: SettingsService) { }
 
@@ -36,20 +37,30 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
     if (ctxCanvas) {
       this.ctxCanvas = ctxCanvas;
       this.drawer = new Drawer(ctxCanvas, 256.0 * this.nbFreqs, true, true);
-      this.audioService.startAnalyser().then((analyser: Analyser) => {
-        this.analyser = analyser;
-        this.draw();
+      this.audioChangeSubscription = this.settings.audioSourceChange.subscribe(() => {
+        if(this.analyser) {
+          // analyser already started = this event doesn't come from a visualizer change but from an audio source change
+          // → we stop the stream to start a new one
+          this.audioService.stop();
+        }
+        this.loadAnalyser()
       });
+      this.loadAnalyser().then(() => this.draw());
       this.displayLengthSupscritpion = this.settings.displayLengthChange.subscribe(value => this.displayLength = value);
     } else {
       console.log("Impossible d'afficher le canvas");
     }
   }
 
+  private async loadAnalyser() {
+    this.analyser = await this.audioService.startAnalyser();
+  }
+
   ngOnDestroy(): void {
     this.analyser?.stop();
     this.analyser = undefined;
     this.drawer = undefined;
+    this.audioChangeSubscription?.unsubscribe();
     this.displayLengthSupscritpion?.unsubscribe();
   }
 

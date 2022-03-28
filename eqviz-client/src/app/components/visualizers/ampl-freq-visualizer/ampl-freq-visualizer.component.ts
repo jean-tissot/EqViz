@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
 import { SettingsService } from 'src/app/services/settings.service';
@@ -14,6 +15,7 @@ export class AmplFreqVisualizerComponent implements OnInit {
   private analyser?: Analyser;
   private drawer?: Drawer;
   private ctxCanvas?: CanvasRenderingContext2D;
+  private audioChangeSubscription?: Subscription;
 
   constructor(private audioService: AudioService, private settings: SettingsService) { }
 
@@ -25,19 +27,29 @@ export class AmplFreqVisualizerComponent implements OnInit {
     if (ctxCanvas) {
       this.ctxCanvas = ctxCanvas;
       this.drawer = new Drawer(ctxCanvas, 256, true);
-      this.audioService.startAnalyser().then((analyser: Analyser) => {
-        this.analyser = analyser;
-        this.draw();
+      this.audioChangeSubscription = this.settings.audioSourceChange.subscribe(() => {
+        if(this.analyser) {
+          // analyser already started = this event doesn't come from a visualizer change but from an audio source change
+          // → we stop the stream to start a new one
+          this.audioService.stop();
+        }
+        this.loadAnalyser()
       });
+      this.loadAnalyser().then(() => this.draw());
     } else {
       console.log("Impossible d'afficher le canvas");
     }
+  }
+
+  private async loadAnalyser() {
+    this.analyser = await this.audioService.startAnalyser();
   }
 
   ngOnDestroy(): void {
     this.analyser?.stop();
     this.analyser = undefined;
     this.drawer = undefined;
+    this.audioChangeSubscription?.unsubscribe()
   }
 
 

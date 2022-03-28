@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
-import { AudioSource, Settings, Visualizer } from "../objects/types";
+import { AudioSourceType, Settings, Visualizer } from "../objects/types";
 import { StorageService } from "./storage.service";
 
 @Injectable({
@@ -22,7 +22,7 @@ export class SettingsService {
     private useMikeAsSource: Settings;
 
     recordings: Map<string, File> = new Map();
-    selectedRecording?: File;
+    private _selectedRecording?: File;
 
     constructor(private storage: StorageService) {
         
@@ -45,6 +45,9 @@ export class SettingsService {
     nfftChange = new BehaviorSubject<number>(0);
     /** You can subscribe to displayLengthChange with the function to call on displayLength change */
     displayLengthChange = new BehaviorSubject<number>(0);
+    // TODO: subscribe to this to display the name of the selected recording in the navbar, and a button to play it
+    /** You can subscribe to audioSourceChange with the function to call when the user changes the selected audio source */
+    audioSourceChange = new BehaviorSubject<File | undefined>(undefined);
 
     async loadRecordings() {
         this.recordings = await this.storage.getSavedFiles();
@@ -84,9 +87,23 @@ export class SettingsService {
         return this.mustSaveToDisk['none'] == 1;
     }
 
-    set audioSource(source: AudioSource) {
+    set audioSource(source: AudioSourceType) {
         this.useMikeAsSource['none'] = (source == 'mike') ? 1 : 0;
         this.saveSetting('audio-source-mike', 'none', this.useMikeAsSource['none']);
+        if(source == 'mike') {
+            this.audioSourceChange.next(undefined);
+        } else {
+            this.audioSourceChange.next(this._selectedRecording);
+        }
+    }
+
+    get selectedRecording(): File | undefined {
+        return this._selectedRecording;
+    }
+
+    set selectedRecording(recording: File | undefined) {
+        this._selectedRecording = recording;
+        this.audioSourceChange.next(recording);
     }
 
     get audioSource() {
