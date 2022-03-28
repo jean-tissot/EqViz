@@ -49,6 +49,7 @@ export class AudioService {
     var source;
     if (this.settings.audioSource == 'recordings' && file) {
       source = await this.audioSourceService.getFileSource(file)
+      // TODO: Play the source in the speakers
       source.start();
       console.log("Starting to play the file " + file.name + " (id: " + fileId + ")");
       this.currentSource = new AudioSource(source, 'recordings', fileId);
@@ -59,13 +60,11 @@ export class AudioService {
     return source;
   }
 
-  /** Useful to play the recording again */
-  private startCurrentSourceIfApplicable() {
-    var sourceNode = this.currentSource?.sourceNode
-    if(sourceNode instanceof AudioBufferSourceNode) {
-      sourceNode.start();
-      console.log("Starting to play the file with id" + this.currentSource?.recordingKey);
-    }
+  /** Useful to play the recording again : stops the current source and starts the analyser again*/
+  public replay() {
+    this.stop();
+    // This will trigger an event in the current visualizer → reloads the analyser
+    this.settings.audioSourceChange.next(this.settings.selectedRecordingId);
   }
 
   public async startAnalyser(): Promise<Analyser> {

@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AudioService } from './services/audio.service';
+import { SettingsService } from './services/settings.service';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +20,7 @@ export class AppComponent implements OnInit, OnDestroy {
   recording = false;
 
   constructor(private breakpointObserver: BreakpointObserver,
-    private audioService: AudioService) { }
+    private audioService: AudioService, public settings: SettingsService) { }
 
   ngOnInit() {
     this.screenSizeObserver = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -59,6 +60,10 @@ export class AppComponent implements OnInit, OnDestroy {
       this.audioService.startRecording();
       this.recording = true;
     }
+  }
+
+  replay() {
+    this.audioService.replay();
   }
 }
 
