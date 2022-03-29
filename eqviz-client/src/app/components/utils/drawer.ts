@@ -42,7 +42,7 @@ export class Drawer {
         this.ctxCanvas.stroke();
     }
 
-    spectrogram(data: Uint8Array[]) {
+    spectrogram(data: Uint8Array[] | number[][]) {
 
         var WIDTH = this.ctxCanvas.canvas.width;
         var HEIGHT = this.ctxCanvas.canvas.height;
