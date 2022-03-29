@@ -75,14 +75,13 @@ export class AudioService {
     this.settings.audioSourceChange.next(this.settings.selectedRecordingId);
   }
 
-  public async startAnalyser(): Promise<Analyser> {
+  public async startAnalyser(smoothingRatio = 0.8): Promise<Analyser> {
     console.log("Starting an analyser");
     const audioSource = await this.getSource();
     var analyser = this.audioSourceService.audioCtx.createAnalyser();
     // Use this value to smooth the audio graph over the time. Default value = 0.8
-    // analyser.smoothingTimeConstant = 0.5;
+    analyser.smoothingTimeConstant = smoothingRatio;
     analyser.fftSize = this.settings.nfft;
-    console.log(analyser);
     return new Analyser(audioSource, analyser, this.settings);
   }
 
