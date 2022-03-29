@@ -15,7 +15,7 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
   private analyser?: Analyser;
   private nbFreqs = 5;
-  private colors = Colors.generate(this.nbFreqs);
+  private colors = Colors.generateGradient(this.nbFreqs);
   private data: number[][] = [];
   private displayLength = 100;
   private ctxCanvas?: CanvasRenderingContext2D;
