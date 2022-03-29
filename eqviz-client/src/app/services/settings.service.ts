@@ -54,7 +54,6 @@ export class SettingsService {
         if(this.selectedRecordingId == undefined && this.recordings.size>0) {
             // TODO: we should save the value of the selected file
             this.selectedRecordingId = this.recordings.keys().next().value;
-            console.log("selected is " , this.selectedRecordingId)
         }
     }
 

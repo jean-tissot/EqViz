@@ -74,8 +74,10 @@ export class AudioService {
     console.log("Starting an analyser");
     const audioSource = await this.getSource();
     var analyser = this.audioSourceService.audioCtx.createAnalyser();
-    analyser.smoothingTimeConstant = 0;
+    // Use this value to smooth the audio graph over the time. Default value = 0.8
+    // analyser.smoothingTimeConstant = 0.5;
     analyser.fftSize = this.settings.nfft;
+    console.log(analyser);
     return new Analyser(audioSource, analyser, this.settings);
   }
 
@@ -95,9 +97,9 @@ export class AudioService {
     if (!this.mediaRecorder || this.mediaRecorder.state == "inactive") return
     this.recording = false;
     this.mediaRecorder?.stop();
+    console.log("Recording ended");
     if (this.settings.visualizerChange.getValue() == 'none' || this.settings.audioSource != 'mike')
       this.audioSourceService.stopMicStream();
-    console.log("Recording ended");
   }
 
   public pauseRecording() {
