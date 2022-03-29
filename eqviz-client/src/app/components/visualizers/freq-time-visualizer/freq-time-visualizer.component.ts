@@ -4,6 +4,7 @@ import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { Drawer } from '../../utils/drawer';
+import Scale from '../../utils/scale';
 
 @Component({
   selector: 'app-freq-time-visualizer',
@@ -68,7 +69,7 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
     var dataFreq = this.analyser.getFrequencyValues();
 
     // TODO: Which exponential factor should we use to logarithmicly scale the data ?
-    var dataFreqLog = this.toLogScale(dataFreq, 1.1);
+    var dataFreqLog = Scale.toLogScale(dataFreq, 1.1);
     
 
     this.data.push(dataFreqLog);
@@ -84,22 +85,6 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
 
     requestAnimationFrame(() => this.draw());
 
-  }
-
-  private toLogScale(data: Uint8Array, factor: number) {
-    var result = []
-    var sumOfValuesToAppend = 0;
-    var nbValueInRangeToAppend = 0;
-    for(let i=0; i<data.length; i++) {
-      sumOfValuesToAppend += data[i];
-      nbValueInRangeToAppend++;
-      if(i>=Math.pow(factor, result.length)) {
-        result.push(sumOfValuesToAppend / nbValueInRangeToAppend);
-        sumOfValuesToAppend = 0;
-        nbValueInRangeToAppend = 0;
-      }
-    }
-    return result;
   }
 
 

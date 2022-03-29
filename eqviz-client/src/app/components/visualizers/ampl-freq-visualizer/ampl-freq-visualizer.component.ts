@@ -4,6 +4,7 @@ import { Analyser } from 'src/app/objects/analyser';
 import { AudioService } from 'src/app/services/audio.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { Drawer } from '../../utils/drawer';
+import Scale from '../../utils/scale';
 
 @Component({
   selector: 'app-ampl-freq-visualizer',
@@ -60,7 +61,7 @@ export class AmplFreqVisualizerComponent implements OnInit {
 
     if (!this.analyser || !this.ctxCanvas) return
 
-    var dataFreq = this.analyser.getFrequencyValues();
+    var dataFreq = Scale.toLogScale(this.analyser.getFrequencyValues(), 1.05);
 
     // this.ctxCanvas.fillStyle = 'rgb(200, 200, 200)';
     this.ctxCanvas.fillRect(0, 0, this.ctxCanvas.canvas.width, this.ctxCanvas.canvas.height);
