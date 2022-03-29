@@ -38,10 +38,12 @@ export class AudioService {
   private async getSource(): Promise<AudioNode> {
     // We keep the current source if possible
     if(this.currentSource?.type == 'mike' && this.settings.audioSource == 'mike') {
+      console.log("Using the mike stream already opened")
       return Promise.resolve(this.currentSource.sourceNode);
     }
     if(this.currentSource?.type == 'recordings' && this.settings.audioSource == 'recordings'
         && this.settings.selectedRecordingId == this.currentSource.recordingKey) {
+        console.log("Using the file stream already opened")
       return Promise.resolve(this.currentSource.sourceNode);
     }
     var file = this.settings.selectedRecording;
@@ -51,7 +53,7 @@ export class AudioService {
       source = await this.audioSourceService.getFileSource(file)
       source.connect(this.audioSourceService.audioCtx.destination);
       source.start();
-      console.log("Starting to play the file " + file.name + " (id: " + fileId + ")");
+      console.log("Starts playing the file " + file.name + " (id: " + fileId + ")");
       this.currentSource = new AudioSource(source, 'recordings', fileId);
     } else {
       source = await this.audioSourceService.getMicSource();

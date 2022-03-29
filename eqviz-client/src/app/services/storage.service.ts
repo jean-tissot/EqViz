@@ -61,7 +61,7 @@ export class StorageService {
                 var keys = objectStore.getAllKeys();
                 var result = new Map<string, File>();
                 keys.onsuccess = () => {
-                    console.log(keys.result);
+                    console.log("Files loaded from the indexed DB : ", keys.result);
                     keys.result.forEach(key => {
                         var request = objectStore.get(key);
                         request.onsuccess = () => result.set(key.toString(), request.result);

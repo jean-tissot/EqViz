@@ -43,12 +43,11 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
           // → we stop the stream to start a new one
           this.audioService.stop();
         }
-        this.loadAnalyser()
+        this.loadAnalyser().then(() => this.draw());
       });
-      this.loadAnalyser().then(() => this.draw());
       this.displayLengthSupscritpion = this.settings.displayLengthChange.subscribe(value => this.displayLength = value);
     } else {
-      console.log("Impossible d'afficher le canvas");
+      console.log("Impossible to display the canvas");
     }
   }
 

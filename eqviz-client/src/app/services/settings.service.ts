@@ -160,7 +160,6 @@ export class SettingsService {
             var value = defaultValues[visualizer];
             if(value !== undefined) {
                 var storageSetting =this.storage.getSetting(this.getSettingKey(settingName, visualizer));
-                console.log(settingName, storageSetting, value);
                 if(storageSetting == null || isNaN(Number(storageSetting))) {
                     ret[visualizer] = value;
                 } else {

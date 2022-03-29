@@ -33,9 +33,8 @@ export class AmplTimeVisualizerComponent implements OnInit {
           // → we stop the stream to start a new one
           this.audioService.stop();
         }
-        this.loadAnalyser()
+        this.loadAnalyser().then(() => this.draw())
       });
-      this.loadAnalyser().then(() => this.draw());
     } else {
       console.log("Impossible to display the canvas")
     }
