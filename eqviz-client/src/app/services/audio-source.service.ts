@@ -42,7 +42,7 @@ export class AudioSourceService {
       return Promise.resolve(this.micAudioSource);
     } else {
       const stream = await this.getNewMicStream();
-      console.log("stream", stream.id, "started");
+      console.log("Stream", stream.id, "started");
       this.micAudioSource = this.audioCtx.createMediaStreamSource(stream);
       return this.micAudioSource;
     }
@@ -51,7 +51,7 @@ export class AudioSourceService {
   public stopMicStream() {
     this.micAudioSource?.disconnect();
     this.micAudioSource?.mediaStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-    console.log("stream", this.micAudioSource?.mediaStream.id, "stopped");
+    console.log("Stream", this.micAudioSource?.mediaStream.id, "stopped");
     this.micAudioSource = undefined;
   }
 

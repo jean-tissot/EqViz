@@ -38,6 +38,7 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
         if(this.analyser) {
           // analyser already started = this event doesn't come from a visualizer change but from an audio source change
           // → we stop the stream to start a new one
+          this.analyser.stop();
           this.audioService.stop();
         }
         this.loadAnalyser().then(() => this.draw());

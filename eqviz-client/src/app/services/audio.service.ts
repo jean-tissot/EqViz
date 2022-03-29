@@ -28,6 +28,7 @@ export class AudioService {
   public stop() {
     if(this.currentSource?.sourceNode instanceof AudioBufferSourceNode) {
       this.currentSource.sourceNode.stop();
+      console.log("Stream from the file with id " + this.currentSource.recordingKey + " stopped");
     } else {
       this.audioSourceService.stopMicStream();
     }
@@ -111,13 +112,13 @@ export class AudioService {
     this.recordedChunks.push(event.data);
     // TODO: simplify the filename ?
     var filename = new Date().toDateString() + " - recording";
+    console.log("Saving audio file ('" + filename + "')...");
     if(this.settings.saveToDisk) {
       this.storageService.saveToDisk(event.data, filename);
     } else {
       this.storageService.saveToBrowser(event.data, filename)
           .then(() => this.settings.loadRecordings());
     }
-    console.log("Saving audio file...");
   }
 
 }
