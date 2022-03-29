@@ -19,18 +19,22 @@ export class AudioService {
   constructor(private audioSourceService: AudioSourceService, private settings: SettingsService,
     private storageService: StorageService) {
     settings.visualizerChange.subscribe((current: Visualizer) => {
-      if (current == 'none' && !this.recording) {
+      if (current == 'none') {
         this.stop();
       }
     })
   }
 
+  /** Stops the current source */
   public stop() {
     if(this.currentSource?.sourceNode instanceof AudioBufferSourceNode) {
       this.currentSource.sourceNode.stop();
       console.log("Stream from the file with id " + this.currentSource.recordingKey + " stopped");
     } else {
-      this.audioSourceService.stopMicStream();
+      // TODO: should we stop the recording and save it ? → need to trigger an event to make the navbar know that the recording is finished
+      if(!this.recording) {
+        this.audioSourceService.stopMicStream();
+      }
     }
     this.currentSource = undefined;
   }
@@ -51,7 +55,8 @@ export class AudioService {
     var fileId = this.settings.selectedRecordingId;
     var source;
     if (this.settings.audioSource == 'recordings' && file) {
-      source = await this.audioSourceService.getFileSource(file)
+      source = await this.audioSourceService.getFileSource(file);
+      // We connect the source to the speakers
       source.connect(this.audioSourceService.audioCtx.destination);
       source.start();
       console.log("Starts playing the file " + file.name + " (id: " + fileId + ")");
@@ -112,8 +117,8 @@ export class AudioService {
 
   private saveRecording(event: BlobEvent) {
     this.recordedChunks.push(event.data);
-    // TODO: simplify the filename ?
-    var filename = new Date().toDateString() + " - recording";
+    // TODO: include the duration of the recording in the filename ?
+    var filename = new Date().toLocaleString();
     console.log("Saving audio file ('" + filename + "')...");
     if(this.settings.saveToDisk) {
       this.storageService.saveToDisk(event.data, filename);
