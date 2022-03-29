@@ -54,7 +54,6 @@ export class SettingsService {
         if(this.selectedRecordingId == undefined && this.recordings.size>0) {
             // TODO: we should save the value of the selected file
             this.selectedRecordingId = this.recordings.keys().next().value;
-            console.log("selected is " , this.selectedRecordingId)
         }
     }
 
@@ -160,7 +159,6 @@ export class SettingsService {
             var value = defaultValues[visualizer];
             if(value !== undefined) {
                 var storageSetting =this.storage.getSetting(this.getSettingKey(settingName, visualizer));
-                console.log(settingName, storageSetting, value);
                 if(storageSetting == null || isNaN(Number(storageSetting))) {
                     ret[visualizer] = value;
                 } else {

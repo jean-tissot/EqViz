@@ -15,7 +15,7 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
   private analyser?: Analyser;
   private drawer?: Drawer;
   private ctxCanvas?: CanvasRenderingContext2D;
-  private data: Uint8Array[] = [];
+  private data: number[][] = [];
   private displayLength = 100;
   private audioChangeSubscription?: Subscription;
   private displayLengthSupscritpion?: Subscription;
@@ -26,7 +26,7 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
     this.settings.setCurrentVisualizer('freq-time');
     this.displayLength = this.settings.displayLengthChange.getValue();
     for (let i = 0; i < this.displayLength; i++) {
-      this.data.push(new Uint8Array());
+      this.data.push([]);
     }
     let canvas = document.getElementById("freq-time-canvas") as HTMLCanvasElement;
     Drawer.fitToContainer(canvas);
@@ -38,14 +38,14 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
         if(this.analyser) {
           // analyser already started = this event doesn't come from a visualizer change but from an audio source change
           // → we stop the stream to start a new one
+          this.analyser.stop();
           this.audioService.stop();
         }
-        this.loadAnalyser()
+        this.loadAnalyser().then(() => this.draw());
       });
-      this.loadAnalyser().then(() => this.draw());
       this.displayLengthSupscritpion = this.settings.displayLengthChange.subscribe(value => this.displayLength = value);
     } else {
-      console.log("Impossible d'afficher le canvas");
+      console.log("Impossible to display the canvas");
     }
   }
 
@@ -67,7 +67,11 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
 
     var dataFreq = this.analyser.getFrequencyValues();
 
-    this.data.push(dataFreq);
+    // TODO: Which exponential factor should we use to logarithmicly scale the data ?
+    var dataFreqLog = this.toLogScale(dataFreq, 1.1);
+    
+
+    this.data.push(dataFreqLog);
 
     this.ctxCanvas.fillRect(0, 0, this.ctxCanvas.canvas.width, this.ctxCanvas.canvas.height);
 
@@ -80,6 +84,22 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
 
     requestAnimationFrame(() => this.draw());
 
+  }
+
+  private toLogScale(data: Uint8Array, factor: number) {
+    var result = []
+    var sumOfValuesToAppend = 0;
+    var nbValueInRangeToAppend = 0;
+    for(let i=0; i<data.length; i++) {
+      sumOfValuesToAppend += data[i];
+      nbValueInRangeToAppend++;
+      if(i>=Math.pow(factor, result.length)) {
+        result.push(sumOfValuesToAppend / nbValueInRangeToAppend);
+        sumOfValuesToAppend = 0;
+        nbValueInRangeToAppend = 0;
+      }
+    }
+    return result;
   }
 
 

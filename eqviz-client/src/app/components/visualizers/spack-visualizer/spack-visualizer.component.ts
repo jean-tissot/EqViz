@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Analyser } from 'src/app/objects/analyser';
+import { AudioSourceService } from 'src/app/services/audio-source.service';
 import { AudioService } from 'src/app/services/audio.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { Colors } from '../../utils/color';
@@ -13,9 +14,10 @@ import { Drawer } from '../../utils/drawer';
 })
 export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
+  private melScaleRanges = [20, 160, 394, 670, 1000, 1420, 1900, 2450, 3120, 4000, 5100, 6600, 9000, 14000];
   private analyser?: Analyser;
-  private nbFreqs = 5;
-  private colors = Colors.generate(this.nbFreqs);
+  private nbFreqs = this.melScaleRanges.length;
+  private colors = Colors.generateGradient(this.nbFreqs);
   private data: number[][] = [];
   private displayLength = 100;
   private ctxCanvas?: CanvasRenderingContext2D;
@@ -23,7 +25,7 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
   private displayLengthSupscritpion?: Subscription;
   private audioChangeSubscription?: Subscription;
 
-  constructor(private audioService: AudioService, private settings: SettingsService) { }
+  constructor(private audioService: AudioService, private settings: SettingsService, private audioSourceService: AudioSourceService) { }
 
   ngOnInit(): void {
     this.settings.setCurrentVisualizer('spack');
@@ -41,19 +43,19 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
         if(this.analyser) {
           // analyser already started = this event doesn't come from a visualizer change but from an audio source change
           // → we stop the stream to start a new one
+          this.analyser.stop();
           this.audioService.stop();
         }
-        this.loadAnalyser()
+        this.loadAnalyser().then(() => this.draw());
       });
-      this.loadAnalyser().then(() => this.draw());
       this.displayLengthSupscritpion = this.settings.displayLengthChange.subscribe(value => this.displayLength = value);
     } else {
-      console.log("Impossible d'afficher le canvas");
+      console.log("Impossible to display the canvas");
     }
   }
 
   private async loadAnalyser() {
-    this.analyser = await this.audioService.startAnalyser();
+    this.analyser = await this.audioService.startAnalyser(0.9);
   }
 
   ngOnDestroy(): void {
@@ -68,12 +70,11 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
     if (!this.analyser || !this.ctxCanvas) return
 
-    var dataFreq = this.analyser.getFrequencyValues();
-    var nbFreqByStack = dataFreq.length / this.nbFreqs;
+    var dataFreq = this.toMelScale(this.analyser.getFrequencyValues());
 
     var precValue = 0
-    for (let i = 0; i < this.nbFreqs; i++) {
-      let value = dataFreq.slice(Math.round(nbFreqByStack * i), Math.round(nbFreqByStack * (i + 1))).reduce((a: number, b: number) => a + b) / nbFreqByStack;
+    for (let i = 0; i < dataFreq.length; i++) {
+      let value = dataFreq[i];
       // we stack the values
       value += precValue;
       this.data[i].push(value);
@@ -99,4 +100,25 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
   }
 
+  private toMelScale(dataFreq: Uint8Array): number[] {
+    var melScaledData = [];
+    var Fe = this.audioSourceService.audioCtx.sampleRate;
+    var frqCount = dataFreq.length; // TODO: should we use the nfft instead ?
+    var step = Fe/frqCount;
+
+    var currentFreqIndex = 0;
+    for(let melRangeEnd of this.melScaleRanges) {
+      let sumOfValuesToAppend = 0;
+      let nbValueInRangeToAppend = 0;
+      for(let i = currentFreqIndex; step*i<melRangeEnd && i<dataFreq.length; i++) {
+        sumOfValuesToAppend += dataFreq[i];
+        nbValueInRangeToAppend++;
+      }
+      // When there is not anymore freqs to process, we break the for loop
+      if(nbValueInRangeToAppend==0) break;
+      melScaledData.push(sumOfValuesToAppend/nbValueInRangeToAppend);
+    }
+
+    return melScaledData;
+  }
 }

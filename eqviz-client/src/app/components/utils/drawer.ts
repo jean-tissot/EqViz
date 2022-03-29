@@ -42,12 +42,13 @@ export class Drawer {
         this.ctxCanvas.stroke();
     }
 
-    spectrogram(data: Uint8Array[]) {
+    spectrogram(data: Uint8Array[] | number[][]) {
 
         var WIDTH = this.ctxCanvas.canvas.width;
         var HEIGHT = this.ctxCanvas.canvas.height;
 
         var dx = WIDTH * 1.0 / (data.length - 1);
+        // TODO: take into account the case where the nfft is change by the user to a lower value
         var ny = data[data.length - 1].length;
         var abs_dy = HEIGHT / (ny - 1);
         var dy = this.inverted ? -abs_dy : abs_dy;
@@ -56,7 +57,7 @@ export class Drawer {
         for (let freqs of data) {
             var y = this.inverted ? HEIGHT - abs_dy : 0;
             for (let i = 0; i < ny; i++) {
-                this.ctxCanvas.fillStyle = Colors.getFromGradient(freqs[i], this.ratio);
+                this.ctxCanvas.fillStyle = Colors.getFromGradient(freqs[i], this.ratio, true);
                 this.ctxCanvas.fillRect(x, y, dx, abs_dy);
                 y += dy;
             }

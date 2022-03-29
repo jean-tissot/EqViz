@@ -1,19 +1,21 @@
 export class Colors {
-  public static generate(n: number) {
+
+  public static generateGradient(n: number, inverted=false) {
     let colors: string[] = [];
     for (let i = n - 1; i >= 0; i--) {
-      colors.push(this.getFromGradient(i, n));
+      colors.push(this.getFromGradient(i, n, inverted));
     }
     return colors;
   }
 
-  public static getFromGradient(value: number, max_value: number): string {
+  public static getFromGradient(value: number, max_value: number, inverted=false): string {
+    var positionInGradient = inverted ? (1 - value / max_value) : value / max_value;
     var r, g, b;
-    [r, g, b] = this.hslToRgb(value / max_value * 180 + 60, 70, 40);
+    [r, g, b] = this.hslToRgb(positionInGradient * 180 + 60, 70, 40);
     return 'rgb(' + r + ',' + g + ',' + b + ')';
   }
 
-  public static hslToRgb(h: number, s: number, l: number): [number, number, number] {
+  private static hslToRgb(h: number, s: number, l: number): [number, number, number] {
     h /= 360;
     s /= 100;
     l /= 100;

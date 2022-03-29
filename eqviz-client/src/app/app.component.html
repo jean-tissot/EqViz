@@ -24,7 +24,7 @@
       <a class="nav-button" routerLink="/ampl-time" routerLinkActive="active">ampl./time</a>
       <a class="nav-button" routerLink="/freq-time" routerLinkActive="active">freq./time</a>
       <a class="nav-button" routerLink="/ampl-freq" routerLinkActive="active">ampl./freq.</a>
-      <button [title]="recording ? 'Sttop recording' : 'Start recording' " 
+      <button [title]="recording ? 'Stop recording' : 'Start recording' " 
           mat-button class="nav-button recordbutton" (click)="toggleRecording()"
           [ngClass]="recording ? 'stop' : 'play'">Record</button>
       <button *ngIf="settings.audioSource=='recordings'" title="Replay the recording"

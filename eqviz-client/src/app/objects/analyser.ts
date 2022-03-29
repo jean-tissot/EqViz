@@ -26,9 +26,9 @@ export class Analyser {
     }
 
     getFrequencyValues(): Uint8Array {
-        var dataTime = new Uint8Array(this.analyserNode.frequencyBinCount);
-        this.analyserNode.getByteFrequencyData(dataTime);
-        return dataTime;
+        var dataFreq = new Uint8Array(this.analyserNode.frequencyBinCount);
+        this.analyserNode.getByteFrequencyData(dataFreq);
+        return dataFreq;
     }
 
 }
