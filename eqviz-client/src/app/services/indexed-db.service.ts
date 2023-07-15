@@ -15,6 +15,7 @@ export class IndexedDBService {
     constructor() {
         if (!window.indexedDB) {
             // TODO: open a popup to alert the user (but only the first time → create a cookie/localstorage key)
+            // TODO: remove the "save to browser" option in the settings bar
             console.log("IndededDB not supported. Audio files will not be saved in the browser")
         }
     }

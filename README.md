@@ -19,7 +19,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 - You need to install NodeJs (you can [download nodejs](https://nodejs.org/en/download/) or install it via the command line interface if you have a packet manager)
 - Once installed you should have npm (node package manager) installed too. To check if it is ok you can run `npm -v`. You may need to add npm to the PATH variable environment ([search on Google...](https://www.google.com/search?q=add+npm+to+path)).
 - You can now install the Angular-CLI via the `npm i -g @angular/cli` command. To check if it is ok you can run `ng version`. You may need to add it also to the PATH (for example [on windows](https://stackoverflow.com/questions/37991556/ng-is-not-recognized-as-an-internal-or-external-command))
-- You should also install make to use shorcut commands defined below (but you can do without it if you want)
+- You should also install `make` to use shorcut commands defined below (but you can do without it if you want)
 
 ### Setting, running, and deploying
 

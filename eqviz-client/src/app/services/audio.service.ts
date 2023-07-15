@@ -59,7 +59,7 @@ export class AudioService {
       // We connect the source to the speakers
       source.connect(this.audioSourceService.audioCtx.destination);
       source.start();
-      console.log("Starts playing the file " + file.name + " (id: " + fileId + ")");
+      console.log("Starts playing the file '%s' (id: %s)", file.name, fileId);
       this.currentSource = new AudioSource(source, 'recordings', fileId);
     } else {
       source = await this.audioSourceService.getMicSource();

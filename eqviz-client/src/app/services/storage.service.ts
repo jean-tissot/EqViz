@@ -9,6 +9,7 @@ export class StorageService {
     constructor(private dbService: IndexedDBService) { }
 
     saveToDisk(file: Blob, name: string) {
+        console.log("Saving file '%s' to disk", name);
         const a = document.createElement("a");
         a.href = URL.createObjectURL(file);
         a.download = name;
@@ -24,6 +25,7 @@ export class StorageService {
     }
 
     saveToBrowser(file: Blob, name: string): Promise<string> {
+        console.log("Saving file %s to the browser", name);
         return new Promise((resolve, reject) => {
             this.dbService.getDB().then(db => {
                 const transaction = db.transaction(IndexedDBService.dbAudioTable, "readwrite");

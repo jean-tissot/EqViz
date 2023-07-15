@@ -50,6 +50,7 @@ export class SettingsService {
     audioSourceChange = new BehaviorSubject<string | undefined>(undefined);
 
     async loadRecordings() {
+        console.log("Loading recordings from the browser");
         this.recordings = await this.storage.getSavedFiles();
         if (this.selectedRecordingId == undefined && this.recordings.size > 0) {
             // TODO: we should save the value of the selected file
