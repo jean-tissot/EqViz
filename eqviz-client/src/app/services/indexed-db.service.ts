@@ -11,9 +11,9 @@ export class IndexedDBService {
     static dbAudioKeyName = "id";
 
     private db?: IDBDatabase;
-    
+
     constructor() {
-        if(!window.indexedDB) {
+        if (!window.indexedDB) {
             // TODO: open a popup to alert the user (but only the first time → create a cookie/localstorage key)
             console.log("IndededDB not supported. Audio files will not be saved in the browser")
         }
@@ -22,11 +22,11 @@ export class IndexedDBService {
     /**
      * Gets the EqvizStorage db, and creates it if necessary
      */
-    private requestDB() : Promise<IDBDatabase> {
+    private requestDB(): Promise<IDBDatabase> {
         return new Promise((resolve, reject) => {
-            if(window.indexedDB) {
+            if (window.indexedDB) {
                 console.log("Requesting the EqVizStorage indexed DB");
-                var request = window.indexedDB.open(IndexedDBService.dbName, IndexedDBService.dbVersion);
+                const request = window.indexedDB.open(IndexedDBService.dbName, IndexedDBService.dbVersion);
                 request.onupgradeneeded = event => this.initDB((event.target as any).result);
                 request.onsuccess = () => {
                     this.checkDBOk(request.result).then(db => {
@@ -44,8 +44,8 @@ export class IndexedDBService {
 
     private initDB(db: IDBDatabase) {
         console.log("Creating the audio table in the EqVizStorage db");
-        var objectStore = db.createObjectStore(IndexedDBService.dbAudioTable, {keyPath: IndexedDBService.dbAudioKeyName, autoIncrement: true});
-        objectStore.createIndex("name", "name", {unique: false});
+        const objectStore = db.createObjectStore(IndexedDBService.dbAudioTable, { keyPath: IndexedDBService.dbAudioKeyName, autoIncrement: true });
+        objectStore.createIndex("name", "name", { unique: false });
         objectStore.transaction.oncomplete = () => console.log("Audio table created");
     }
 
@@ -54,7 +54,7 @@ export class IndexedDBService {
      * @returns the given db if ok, else the db from a new requestDB call
      */
     private checkDBOk(db: IDBDatabase) {
-        if(!db.objectStoreNames.contains(IndexedDBService.dbAudioTable)) {
+        if (!db.objectStoreNames.contains(IndexedDBService.dbAudioTable)) {
             indexedDB.deleteDatabase(IndexedDBService.dbName);
             return this.requestDB();
         } else {
@@ -66,7 +66,7 @@ export class IndexedDBService {
      * Gets the EqVizStorage db (makes the request if necessary) 
      */
     public getDB(): Promise<IDBDatabase> {
-        if(this.db) {
+        if (this.db) {
             return Promise.resolve(this.db);
         } else {
             return this.requestDB();

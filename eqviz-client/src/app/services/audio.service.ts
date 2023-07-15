@@ -27,12 +27,12 @@ export class AudioService {
 
   /** Stops the current source */
   public stop() {
-    if(this.currentSource?.sourceNode instanceof AudioBufferSourceNode) {
+    if (this.currentSource?.sourceNode instanceof AudioBufferSourceNode) {
       this.currentSource.sourceNode.stop();
       console.log("Stream from the file with id " + this.currentSource.recordingKey + " stopped");
     } else {
       // TODO: should we stop the recording and save it ? → need to trigger an event to make the navbar know that the recording is finished
-      if(!this.recording) {
+      if (!this.recording) {
         this.audioSourceService.stopMicStream();
       }
     }
@@ -42,18 +42,18 @@ export class AudioService {
   /** Gets the source to use for the analyser (creating a new source only if the selection has change in the interface) */
   private async getSource(): Promise<AudioNode> {
     // We keep the current source if possible
-    if(this.currentSource?.type == 'mike' && this.settings.audioSource == 'mike') {
+    if (this.currentSource?.type == 'mike' && this.settings.audioSource == 'mike') {
       console.log("Using the mike stream already opened")
       return Promise.resolve(this.currentSource.sourceNode);
     }
-    if(this.currentSource?.type == 'recordings' && this.settings.audioSource == 'recordings'
-        && this.settings.selectedRecordingId == this.currentSource.recordingKey) {
-        console.log("Using the file stream already opened")
+    if (this.currentSource?.type == 'recordings' && this.settings.audioSource == 'recordings'
+      && this.settings.selectedRecordingId == this.currentSource.recordingKey) {
+      console.log("Using the file stream already opened")
       return Promise.resolve(this.currentSource.sourceNode);
     }
-    var file = this.settings.selectedRecording;
-    var fileId = this.settings.selectedRecordingId;
-    var source;
+    const file = this.settings.selectedRecording;
+    const fileId = this.settings.selectedRecordingId;
+    let source;
     if (this.settings.audioSource == 'recordings' && file) {
       source = await this.audioSourceService.getFileSource(file);
       // We connect the source to the speakers
@@ -78,7 +78,7 @@ export class AudioService {
   public async startAnalyser(smoothingRatio = 0.8): Promise<Analyser> {
     console.log("Starting an analyser");
     const audioSource = await this.getSource();
-    var analyser = this.audioSourceService.audioCtx.createAnalyser();
+    const analyser = this.audioSourceService.audioCtx.createAnalyser();
     // Use this value to smooth the audio graph over the time. Default value = 0.8
     analyser.smoothingTimeConstant = smoothingRatio;
     analyser.fftSize = this.settings.nfft;
@@ -117,13 +117,13 @@ export class AudioService {
   private saveRecording(event: BlobEvent) {
     this.recordedChunks.push(event.data);
     // TODO: include the duration of the recording in the filename ?
-    var filename = new Date().toLocaleString();
+    const filename = new Date().toLocaleString();
     console.log("Saving audio file ('" + filename + "')...");
-    if(this.settings.saveToDisk) {
+    if (this.settings.saveToDisk) {
       this.storageService.saveToDisk(event.data, filename);
     } else {
       this.storageService.saveToBrowser(event.data, filename)
-          .then(() => this.settings.loadRecordings());
+        .then(() => this.settings.loadRecordings());
     }
   }
 

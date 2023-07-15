@@ -25,11 +25,11 @@ export class SettingsService {
     private _selectedRecordingId?: string;
 
     constructor(private storage: StorageService) {
-        
-        var defaultNfftValues = {'spack': 512, 'ampl-time': 4096, 'freq-time': 128, 'ampl-freq': 2048};
-        var defaultDisplayLengthValues = { 'spack': 100, 'freq-time': 100 };
-        var defaultSaveToDisk = {'none' : 0}; // by default we doesn't save recordings to disk (but to browser)
-        var defaultUseMikeAsSource = {'none' : 1}; // by default we use the microphone as audio source
+
+        const defaultNfftValues = { 'spack': 512, 'ampl-time': 4096, 'freq-time': 128, 'ampl-freq': 2048 };
+        const defaultDisplayLengthValues = { 'spack': 100, 'freq-time': 100 };
+        const defaultSaveToDisk = { 'none': 0 }; // by default we doesn't save recordings to disk (but to browser)
+        const defaultUseMikeAsSource = { 'none': 1 }; // by default we use the microphone as audio source
 
         this.nfftValues = this.loadSetting('nfft', defaultNfftValues);
         this.displayLengthValues = this.loadSetting('display-length', defaultDisplayLengthValues);
@@ -51,7 +51,7 @@ export class SettingsService {
 
     async loadRecordings() {
         this.recordings = await this.storage.getSavedFiles();
-        if(this.selectedRecordingId == undefined && this.recordings.size>0) {
+        if (this.selectedRecordingId == undefined && this.recordings.size > 0) {
             // TODO: we should save the value of the selected file
             this.selectedRecordingId = this.recordings.keys().next().value;
         }
@@ -90,7 +90,7 @@ export class SettingsService {
     set audioSource(source: AudioSourceType) {
         this.useMikeAsSource['none'] = (source == 'mike') ? 1 : 0;
         this.saveSetting('audio-source-mike', 'none', this.useMikeAsSource['none']);
-        if(source == 'mike') {
+        if (source == 'mike') {
             this.audioSourceChange.next(undefined);
         } else {
             this.audioSourceChange.next(this._selectedRecordingId);
@@ -126,8 +126,8 @@ export class SettingsService {
     }
 
     private loadVisualizerSettings(current: Visualizer) {
-        var nfft = this.nfftValues[current];
-        var displayLength = this.displayLengthValues[current];
+        const nfft = this.nfftValues[current];
+        const displayLength = this.displayLengthValues[current];
         if (nfft) {
             this.nfftChange.next(nfft);
         }
@@ -154,12 +154,12 @@ export class SettingsService {
      * default values for those not present in the localstorage
      */
     private loadSetting(settingName: string, defaultValues: Settings): Settings {
-        var ret: Settings = {};
+        const ret: Settings = {};
         this.visualizers.forEach(visualizer => {
-            var value = defaultValues[visualizer];
-            if(value !== undefined) {
-                var storageSetting =this.storage.getSetting(this.getSettingKey(settingName, visualizer));
-                if(storageSetting == null || isNaN(Number(storageSetting))) {
+            const value = defaultValues[visualizer];
+            if (value !== undefined) {
+                const storageSetting = this.storage.getSetting(this.getSettingKey(settingName, visualizer));
+                if (storageSetting == null || isNaN(Number(storageSetting))) {
                     ret[visualizer] = value;
                 } else {
                     ret[visualizer] = Number(storageSetting);

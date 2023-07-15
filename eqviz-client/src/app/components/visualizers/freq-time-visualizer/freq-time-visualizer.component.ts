@@ -29,14 +29,14 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.displayLength; i++) {
       this.data.push([]);
     }
-    let canvas = document.getElementById("freq-time-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById("freq-time-canvas") as HTMLCanvasElement;
     Drawer.fitToContainer(canvas);
-    let ctxCanvas = canvas?.getContext("2d");
+    const ctxCanvas = canvas?.getContext("2d");
     if (ctxCanvas) {
       this.ctxCanvas = ctxCanvas;
       this.drawer = new Drawer(ctxCanvas, 256, true);
       this.audioChangeSubscription = this.settings.audioSourceChange.subscribe(() => {
-        if(this.analyser) {
+        if (this.analyser) {
           // analyser already started = this event doesn't come from a visualizer change but from an audio source change
           // → we stop the stream to start a new one
           this.analyser.stop();
@@ -66,11 +66,11 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
   private draw() {
     if (!this.analyser || !this.ctxCanvas) return
 
-    var dataFreq = this.analyser.getFrequencyValues();
+    const dataFreq = this.analyser.getFrequencyValues();
 
     // TODO: Which exponential factor should we use to logarithmicly scale the data ?
-    var dataFreqLog = Scale.toLogScale(dataFreq, 1.1);
-    
+    const dataFreqLog = Scale.toLogScale(dataFreq, 1.1);
+
 
     this.data.push(dataFreqLog);
 
@@ -79,7 +79,7 @@ export class FreqTimeVisualizerComponent implements OnInit, OnDestroy {
     this.ctxCanvas.lineWidth = 2;
     this.ctxCanvas.strokeStyle = 'rgb(200, 0, 200)';
 
-    var start = this.data.length - this.displayLength;
+    const start = this.data.length - this.displayLength;
 
     this.drawer?.spectrogram(this.data.slice(start, this.data.length));
 

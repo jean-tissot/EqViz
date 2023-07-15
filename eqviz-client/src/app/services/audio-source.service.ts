@@ -16,7 +16,7 @@ export class AudioSourceService {
       navigator.mediaDevices.getUserMedia = function (constraints) {
 
         // First get ahold of the legacy getUserMedia, if present
-        var getUserMedia = (navigator as any).webkitGetUserMedia || (navigator as any).mozGetUserMedia || (navigator as any).msGetUserMedia;
+        let getUserMedia = (navigator as any).webkitGetUserMedia || (navigator as any).mozGetUserMedia || (navigator as any).msGetUserMedia;
 
         // Some browsers just don't implement it - return a rejected promise with an error
         // to keep a consistent interface
@@ -38,7 +38,7 @@ export class AudioSourceService {
 
 
   public async getMicSource(): Promise<MediaStreamAudioSourceNode> {
-    if (this.micAudioSource && this.micAudioSource?.mediaStream.active) {
+    if (this.micAudioSource?.mediaStream.active) {
       return Promise.resolve(this.micAudioSource);
     } else {
       const stream = await this.getNewMicStream();
@@ -66,7 +66,7 @@ export class AudioSourceService {
 
   
   public getVoidStream(): Promise<MediaStream> {
-    var stream = new MediaStream();
+    let stream = new MediaStream();
     return new Promise(() => stream);
   }
 

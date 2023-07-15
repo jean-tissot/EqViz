@@ -22,14 +22,14 @@ export class AmplFreqVisualizerComponent implements OnInit {
 
   ngOnInit(): void {
     this.settings.setCurrentVisualizer('ampl-freq');
-    let canvas = document.getElementById("ampl-freq-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById("ampl-freq-canvas") as HTMLCanvasElement;
     Drawer.fitToContainer(canvas);
-    let ctxCanvas = canvas?.getContext("2d");
+    const ctxCanvas = canvas?.getContext("2d");
     if (ctxCanvas) {
       this.ctxCanvas = ctxCanvas;
       this.drawer = new Drawer(ctxCanvas, 256, true);
       this.audioChangeSubscription = this.settings.audioSourceChange.subscribe(() => {
-        if(this.analyser) {
+        if (this.analyser) {
           // analyser already started = this event doesn't come from a visualizer change but from an audio source change
           // → we stop the stream to start a new one
           this.analyser.stop();
@@ -61,7 +61,7 @@ export class AmplFreqVisualizerComponent implements OnInit {
 
     if (!this.analyser || !this.ctxCanvas) return
 
-    var dataFreq = Scale.toLogScale(this.analyser.getFrequencyValues(), 1.05);
+    const dataFreq = Scale.toLogScale(this.analyser.getFrequencyValues(), 1.05);
 
     // this.ctxCanvas.fillStyle = 'rgb(200, 200, 200)';
     this.ctxCanvas.fillRect(0, 0, this.ctxCanvas.canvas.width, this.ctxCanvas.canvas.height);

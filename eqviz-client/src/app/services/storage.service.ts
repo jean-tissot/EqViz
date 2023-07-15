@@ -6,10 +6,10 @@ import { IndexedDBService } from "./indexed-db.service";
 })
 export class StorageService {
 
-    constructor(private dbService: IndexedDBService) {}
+    constructor(private dbService: IndexedDBService) { }
 
     saveToDisk(file: Blob, name: string) {
-        var a = document.createElement("a");
+        const a = document.createElement("a");
         a.href = URL.createObjectURL(file);
         a.download = name;
         document.body.appendChild(a);
@@ -26,9 +26,9 @@ export class StorageService {
     saveToBrowser(file: Blob, name: string): Promise<string> {
         return new Promise((resolve, reject) => {
             this.dbService.getDB().then(db => {
-                var transaction = db.transaction(IndexedDBService.dbAudioTable, "readwrite");
+                const transaction = db.transaction(IndexedDBService.dbAudioTable, "readwrite");
                 transaction.onerror = (err) => this.saveToDiskInErrorCase(file, name, err);
-                var request = transaction.objectStore(IndexedDBService.dbAudioTable).add(new File([file], name));
+                const request = transaction.objectStore(IndexedDBService.dbAudioTable).add(new File([file], name));
                 request.onsuccess = () => {
                     console.log("File %s saved to the browser with id %s", name, request.result);
                     resolve(request.result.toString());
@@ -56,14 +56,14 @@ export class StorageService {
     getSavedFiles(): Promise<Map<string, File>> {
         return new Promise((resolve, reject) => {
             this.dbService.getDB().then(db => {
-                var transaction = db.transaction(IndexedDBService.dbAudioTable, "readonly");
-                var objectStore = transaction.objectStore(IndexedDBService.dbAudioTable);
-                var keys = objectStore.getAllKeys();
-                var result = new Map<string, File>();
+                const transaction = db.transaction(IndexedDBService.dbAudioTable, "readonly");
+                const objectStore = transaction.objectStore(IndexedDBService.dbAudioTable);
+                const keys = objectStore.getAllKeys();
+                const result = new Map<string, File>();
                 keys.onsuccess = () => {
                     console.log("Files loaded from the indexed DB : ", keys.result);
                     keys.result.forEach(key => {
-                        var request = objectStore.get(key);
+                        const request = objectStore.get(key);
                         request.onsuccess = () => result.set(key.toString(), request.result);
                     });
                 }

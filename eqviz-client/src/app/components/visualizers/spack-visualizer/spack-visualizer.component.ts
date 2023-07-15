@@ -33,14 +33,14 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.nbFreqs; i++) {
       this.data.push(new Array(this.displayLength).fill(0));
     }
-    let canvas = document.getElementById("spack-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById("spack-canvas") as HTMLCanvasElement;
     Drawer.fitToContainer(canvas);
-    let ctxCanvas = canvas?.getContext("2d");
+    const ctxCanvas = canvas?.getContext("2d");
     if (ctxCanvas) {
       this.ctxCanvas = ctxCanvas;
       this.drawer = new Drawer(ctxCanvas, 256.0 * this.nbFreqs, true, true);
       this.audioChangeSubscription = this.settings.audioSourceChange.subscribe(() => {
-        if(this.analyser) {
+        if (this.analyser) {
           // analyser already started = this event doesn't come from a visualizer change but from an audio source change
           // → we stop the stream to start a new one
           this.analyser.stop();
@@ -70,10 +70,10 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
     if (!this.analyser || !this.ctxCanvas) return
 
-    var Fe = this.audioSourceService.audioCtx.sampleRate;
-    var dataFreq = Scale.toMelScale(this.analyser.getFrequencyValues(), Fe);
+    const Fe = this.audioSourceService.audioCtx.sampleRate;
+    const dataFreq = Scale.toMelScale(this.analyser.getFrequencyValues(), Fe);
 
-    var precValue = 0
+    let precValue = 0
     for (let i = 0; i < dataFreq.length; i++) {
       let value = dataFreq[i];
       // we stack the values
@@ -87,7 +87,7 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
     this.ctxCanvas.lineWidth = 3;
 
-    var start = Math.max(0, this.data[0].length - this.displayLength);
+    const start = Math.max(0, this.data[0].length - this.displayLength);
 
     for (let i = this.nbFreqs - 1; i >= 0; i--) {
 
@@ -101,5 +101,5 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
   }
 
-  
+
 }
