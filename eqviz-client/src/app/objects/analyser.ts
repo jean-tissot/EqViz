@@ -20,13 +20,13 @@ export class Analyser {
     }
 
     getTimeDomainValues(): Uint8Array {
-        var dataTime = new Uint8Array(this.analyserNode.frequencyBinCount);
+        const dataTime = new Uint8Array(this.analyserNode.frequencyBinCount);
         this.analyserNode.getByteTimeDomainData(dataTime);
         return dataTime;
     }
 
     getFrequencyValues(): Uint8Array {
-        var dataFreq = new Uint8Array(this.analyserNode.frequencyBinCount);
+        const dataFreq = new Uint8Array(this.analyserNode.frequencyBinCount);
         this.analyserNode.getByteFrequencyData(dataFreq);
         return dataFreq;
     }

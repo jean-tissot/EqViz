@@ -6,6 +6,7 @@ import { AudioService } from 'src/app/services/audio.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { Colors } from '../../utils/color';
 import { Drawer } from '../../utils/drawer';
+import Scale from '../../utils/scale';
 
 @Component({
   selector: 'app-spack-visualizer',
@@ -14,9 +15,8 @@ import { Drawer } from '../../utils/drawer';
 })
 export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
-  private melScaleRanges = [20, 160, 394, 670, 1000, 1420, 1900, 2450, 3120, 4000, 5100, 6600, 9000, 14000];
   private analyser?: Analyser;
-  private nbFreqs = this.melScaleRanges.length;
+  private nbFreqs = Scale.melScaleRanges.length;
   private colors = Colors.generateGradient(this.nbFreqs);
   private data: number[][] = [];
   private displayLength = 100;
@@ -33,14 +33,14 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.nbFreqs; i++) {
       this.data.push(new Array(this.displayLength).fill(0));
     }
-    let canvas = document.getElementById("spack-canvas") as HTMLCanvasElement;
+    const canvas = document.getElementById("spack-canvas") as HTMLCanvasElement;
     Drawer.fitToContainer(canvas);
-    let ctxCanvas = canvas?.getContext("2d");
+    const ctxCanvas = canvas?.getContext("2d");
     if (ctxCanvas) {
       this.ctxCanvas = ctxCanvas;
       this.drawer = new Drawer(ctxCanvas, 256.0 * this.nbFreqs, true, true);
       this.audioChangeSubscription = this.settings.audioSourceChange.subscribe(() => {
-        if(this.analyser) {
+        if (this.analyser) {
           // analyser already started = this event doesn't come from a visualizer change but from an audio source change
           // → we stop the stream to start a new one
           this.analyser.stop();
@@ -70,9 +70,10 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
     if (!this.analyser || !this.ctxCanvas) return
 
-    var dataFreq = this.toMelScale(this.analyser.getFrequencyValues());
+    const Fe = this.audioSourceService.audioCtx.sampleRate;
+    const dataFreq = Scale.toMelScale(this.analyser.getFrequencyValues(), Fe);
 
-    var precValue = 0
+    let precValue = 0
     for (let i = 0; i < dataFreq.length; i++) {
       let value = dataFreq[i];
       // we stack the values
@@ -86,7 +87,7 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
     this.ctxCanvas.lineWidth = 3;
 
-    var start = Math.max(0, this.data[0].length - this.displayLength);
+    const start = Math.max(0, this.data[0].length - this.displayLength);
 
     for (let i = this.nbFreqs - 1; i >= 0; i--) {
 
@@ -100,25 +101,5 @@ export class SpackVisualizerComponent implements OnInit, OnDestroy {
 
   }
 
-  private toMelScale(dataFreq: Uint8Array): number[] {
-    var melScaledData = [];
-    var Fe = this.audioSourceService.audioCtx.sampleRate;
-    var frqCount = dataFreq.length; // TODO: should we use the nfft instead ?
-    var step = Fe/frqCount;
 
-    var currentFreqIndex = 0;
-    for(let melRangeEnd of this.melScaleRanges) {
-      let sumOfValuesToAppend = 0;
-      let nbValueInRangeToAppend = 0;
-      for(let i = currentFreqIndex; step*i<melRangeEnd && i<dataFreq.length; i++) {
-        sumOfValuesToAppend += dataFreq[i];
-        nbValueInRangeToAppend++;
-      }
-      // When there is not anymore freqs to process, we break the for loop
-      if(nbValueInRangeToAppend==0) break;
-      melScaledData.push(sumOfValuesToAppend/nbValueInRangeToAppend);
-    }
-
-    return melScaledData;
-  }
 }

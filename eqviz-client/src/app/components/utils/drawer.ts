@@ -11,9 +11,9 @@ export class Drawer {
 
     trace(data: number[] | Uint8Array) {
 
-        var WIDTH = this.ctxCanvas.canvas.width;
-        var HEIGHT = this.ctxCanvas.canvas.height;
-        var dx = WIDTH * 1.0 / (data.length - 1);
+        const WIDTH = this.ctxCanvas.canvas.width;
+        const HEIGHT = this.ctxCanvas.canvas.height;
+        const dx = WIDTH * 1.0 / (data.length - 1);
 
         this.ctxCanvas.beginPath();
         if (this.filled) {
@@ -22,7 +22,7 @@ export class Drawer {
             let y = data[0] / this.ratio;
             this.ctxCanvas.moveTo(0, this.inverted ? (1 - y) * HEIGHT : y * HEIGHT);
         }
-        var x = 0;
+        let x = 0;
 
         for (let value of data) {
 
@@ -44,18 +44,18 @@ export class Drawer {
 
     spectrogram(data: Uint8Array[] | number[][]) {
 
-        var WIDTH = this.ctxCanvas.canvas.width;
-        var HEIGHT = this.ctxCanvas.canvas.height;
+        const WIDTH = this.ctxCanvas.canvas.width;
+        const HEIGHT = this.ctxCanvas.canvas.height;
 
-        var dx = WIDTH * 1.0 / (data.length - 1);
+        const dx = WIDTH * 1.0 / (data.length - 1);
         // TODO: take into account the case where the nfft is change by the user to a lower value
-        var ny = data[data.length - 1].length;
-        var abs_dy = HEIGHT / (ny - 1);
-        var dy = this.inverted ? -abs_dy : abs_dy;
+        const ny = data[data.length - 1].length;
+        const abs_dy = HEIGHT / (ny - 1);
+        const dy = this.inverted ? -abs_dy : abs_dy;
 
-        var x = 0;
+        let x = 0;
         for (let freqs of data) {
-            var y = this.inverted ? HEIGHT - abs_dy : 0;
+            let y = this.inverted ? HEIGHT - abs_dy : 0;
             for (let i = 0; i < ny; i++) {
                 this.ctxCanvas.fillStyle = Colors.getFromGradient(freqs[i], this.ratio, true);
                 this.ctxCanvas.fillRect(x, y, dx, abs_dy);

@@ -1,15 +1,14 @@
 import { Injectable } from "@angular/core";
-import { IndexedDBService } from "./indexed-db.service";
+import * as localforage from "localforage";
 
 @Injectable({
     providedIn: 'root'
 })
 export class StorageService {
 
-    constructor(private dbService: IndexedDBService) {}
-
     saveToDisk(file: Blob, name: string) {
-        var a = document.createElement("a");
+        console.log("Saving file '%s' to disk", name);
+        const a = document.createElement("a");
         a.href = URL.createObjectURL(file);
         a.download = name;
         document.body.appendChild(a);
@@ -23,27 +22,12 @@ export class StorageService {
         return new File([], "");
     }
 
-    saveToBrowser(file: Blob, name: string): Promise<string> {
-        return new Promise((resolve, reject) => {
-            this.dbService.getDB().then(db => {
-                var transaction = db.transaction(IndexedDBService.dbAudioTable, "readwrite");
-                transaction.onerror = (err) => this.saveToDiskInErrorCase(file, name, err);
-                var request = transaction.objectStore(IndexedDBService.dbAudioTable).add(new File([file], name));
-                request.onsuccess = () => {
-                    console.log("File %s saved to the browser with id %s", name, request.result);
-                    resolve(request.result.toString());
-                }
-                request.onerror = (err) => {
-                    this.saveToDiskInErrorCase(file, name, err);
-                    reject(err);
-                }
-            }).catch(error => {
-                console.log(error);
-                alert("Cannot access the indexed DB. It may be because you didn't authorize it. Saving to the disk...");
-                this.saveToDisk(file, name);
-                reject(error);
-            });
-        });
+    saveToBrowser(content: Blob, name: string): Promise<string | void> {
+        const file = new File([content], name);
+        return localforage.setItem(name, file).then(() => {
+            console.log("File %s saved to the browser", name);
+            return name;
+        }).catch(error => this.saveToDiskInErrorCase(file, name, error));
     }
 
     /**
@@ -54,22 +38,16 @@ export class StorageService {
      * @returns A {@link Map} with Files as values and File ids as keys
      */
     getSavedFiles(): Promise<Map<string, File>> {
-        return new Promise((resolve, reject) => {
-            this.dbService.getDB().then(db => {
-                var transaction = db.transaction(IndexedDBService.dbAudioTable, "readonly");
-                var objectStore = transaction.objectStore(IndexedDBService.dbAudioTable);
-                var keys = objectStore.getAllKeys();
-                var result = new Map<string, File>();
-                keys.onsuccess = () => {
-                    console.log("Files loaded from the indexed DB : ", keys.result);
-                    keys.result.forEach(key => {
-                        var request = objectStore.get(key);
-                        request.onsuccess = () => result.set(key.toString(), request.result);
-                    });
-                }
-                transaction.oncomplete = () => resolve(result);
-                transaction.onerror = (error) => reject(error);
-            })
+        return localforage.keys().then(keys => {
+            const result = new Map<string, File>();
+            keys.forEach(key => {
+                localforage.getItem(key).then(file => {
+                    if (file instanceof Blob) {
+                        result.set(key, new File([file], key));
+                    }
+                });
+            });
+            return result;
         });
     }
 
