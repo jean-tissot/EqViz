@@ -1,6 +1,8 @@
 # EqViz: Equalisation visualizer
 
 The goal of this project is to make an implementation of [this new visualization of audio data](https://hal.archives-ouvertes.fr/hal-01807481).  
+You can test it on https://jean-tissot.github.io/EqViz/.  
+
 It should contain these features:
 
 - Interactive visualization of audio data (captured by the microphone)
